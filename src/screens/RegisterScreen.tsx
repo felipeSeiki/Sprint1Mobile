@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Scro
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useAuth } from '../contexts/AuthContext';
 
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
@@ -26,8 +27,25 @@ export const RegisterScreen: React.FC = () => {
     }));
   };
 
-  const handleSubmit = () => {
-
+  const { register } = useAuth();
+  
+  const handleSubmit = async () => {
+    try {
+      await register({
+        name: formData.usuario,
+        email: formData.usuario,
+        password: formData.senha,
+        cep: formData.cep,
+        logradouro: formData.logradouro,
+        numero: formData.numero,
+        cidade: formData.cidade,
+        estado: formData.estado
+      });
+      // Registro bem sucedido, a navegação será automática
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+      alert('Erro ao realizar cadastro: ' + errorMessage);
+    }
   };
 
   return (

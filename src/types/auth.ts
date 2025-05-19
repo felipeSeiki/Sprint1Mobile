@@ -36,8 +36,17 @@ export interface Patient extends BaseUser {
 /**
  * Interface do administrador
  */
+export interface Address {
+  cep: string;
+  logradouro: string;
+  numero: string;
+  cidade: string;
+  estado: string;
+}
+
 export interface Admin extends BaseUser {
   role: 'admin';
+  endereco?: Address;
 }
 
 /**
@@ -60,6 +69,11 @@ export interface RegisterData {
   name: string;
   email: string;
   password: string;
+  cep?: string;
+  logradouro?: string;
+  numero?: string;
+  cidade?: string;
+  estado?: string;
 }
 
 /**

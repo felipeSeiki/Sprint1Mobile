@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
+import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -8,41 +8,51 @@ const STORAGE_KEYS = {
   REGISTERED_USERS: '@MedicalApp:registeredUsers',
 };
 
-// Médicos mockados que podem fazer login
-const mockDoctors = [
+// Motos mockadas para teste
+const mockMotos = [
   {
     id: '1',
-    name: 'Dr. João Silva',
-    email: 'joao@example.com',
-    role: 'doctor' as const,
-    specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
+    modelo: 'Honda CB 500',
+    placa: 'ABC-1234',
+    cod_tag: 'TAG001',
+    status: 'Disponível',
+    posicaoX: '10',
+    posicaoY: '20',
   },
   {
     id: '2',
-    name: 'Dra. Maria Santos',
-    email: 'maria@example.com',
-    role: 'doctor' as const,
-    specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    modelo: 'Yamaha MT-07',
+    placa: 'DEF-5678',
+    cod_tag: 'TAG002',
+    status: 'Manutenção',
+    posicaoX: '2',
+    posicaoY: '15',
   },
   {
     id: '3',
-    name: 'Dr. Pedro Oliveira',
-    email: 'pedro@example.com',
-    role: 'doctor' as const,
-    specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
+    modelo: 'Kawasaki Ninja 400',
+    placa: 'GHI-9012',
+    cod_tag: 'TAG003',
+    status: 'Estacionada',
+    posicaoX: '4',
+    posicaoY: '20',
   },
 ];
 
-// Admin mockado
-const mockAdmin = {
-  id: 'admin',
-  name: 'Administrador',
-  email: 'admin@example.com',
+// Usuário padrão mockado
+const mockUser = {
+  id: 'default_user',
+  name: 'Usuário Padrão',
+  email: 'usuario@sistema.com',
   role: 'admin' as const,
   image: 'https://randomuser.me/api/portraits/men/3.jpg',
+  endereco: {
+    cep: '00000-000',
+    logradouro: 'Rua Exemplo',
+    numero: '123',
+    cidade: 'São Paulo',
+    estado: 'SP'
+  }
 };
 
 // Lista de usuários cadastrados (pacientes)
@@ -50,37 +60,23 @@ let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Verifica se é o admin
-    if (credentials.email === mockAdmin.email && credentials.password === '123456') {
+    // Verifica se é o usuário padrão
+    if (credentials.email === mockUser.email && credentials.password === '123456') {
       return {
-        user: mockAdmin,
-        token: 'admin-token',
+        user: mockUser,
+        token: 'user-token',
       };
     }
 
-    // Verifica se é um médico
-    const doctor = mockDoctors.find(
-      (d) => d.email === credentials.email && credentials.password === '123456'
+    // Verifica se é um usuário registrado
+    const registeredUser = registeredUsers.find(
+      (u) => u.email === credentials.email && credentials.password === '123456'
     );
-    if (doctor) {
+    if (registeredUser) {
       return {
-        user: doctor,
-        token: `doctor-token-${doctor.id}`,
+        user: registeredUser,
+        token: `user-token-${registeredUser.id}`,
       };
-    }
-
-    // Verifica se é um paciente registrado
-    const patient = registeredUsers.find(
-      (p) => p.email === credentials.email
-    );
-    if (patient) {
-      // Para pacientes, a senha padrão é 123456
-      if (credentials.password === '123456') {
-        return {
-          user: patient,
-          token: `patient-token-${patient.id}`,
-        };
-      }
     }
 
     throw new Error('Email ou senha inválidos');
@@ -89,31 +85,36 @@ export const authService = {
   async register(data: RegisterData): Promise<AuthResponse> {
     // Verifica se o email já está em uso
     if (
-      mockDoctors.some((d) => d.email === data.email) ||
-      mockAdmin.email === data.email ||
+      mockUser.email === data.email ||
       registeredUsers.some((u) => u.email === data.email)
     ) {
       throw new Error('Email já está em uso');
     }
 
-    // Cria um novo paciente
-    const newPatient: User = {
-      id: `patient-${registeredUsers.length + 1}`,
+    // Cria um novo usuário administrador
+    const newUser: Admin = {
+      id: `user-${registeredUsers.length + 1}`,
       name: data.name,
       email: data.email,
-      role: 'patient' as const,
-      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${registeredUsers.length + 1
-        }.jpg`,
+      role: 'admin' as const,
+      image: `https://randomuser.me/api/portraits/men/${registeredUsers.length + 1}.jpg`,
+      endereco: {
+        cep: data.cep || '',
+        logradouro: data.logradouro || '',
+        numero: data.numero || '',
+        cidade: data.cidade || '',
+        estado: data.estado || ''
+      }
     };
 
-    registeredUsers.push(newPatient);
+    registeredUsers.push(newUser);
 
     // Salva a lista atualizada de usuários
     await AsyncStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(registeredUsers));
 
     return {
-      user: newPatient,
-      token: `patient-token-${newPatient.id}`,
+      user: newUser,
+      token: `user-token-${newUser.id}`,
     };
   },
 
@@ -138,11 +139,11 @@ export const authService = {
 
   // Funções para o admin
   async getAllUsers(): Promise<User[]> {
-    return [...mockDoctors, ...registeredUsers];
+    return [mockUser, ...registeredUsers];
   },
 
   async getAllDoctors(): Promise<User[]> {
-    return mockDoctors;
+    return [mockUser];
   },
 
   async getPatients(): Promise<User[]> {
@@ -160,4 +161,4 @@ export const authService = {
       console.error('Erro ao carregar usuários registrados:', error);
     }
   },
-}; 
+};

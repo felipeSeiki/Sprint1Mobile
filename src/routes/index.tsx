@@ -1,21 +1,48 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import CreateAppointmentScreen from '../screens/RegisterMotoScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
+import { useAuth } from '../contexts/AuthContext';
+import { RootStackParamList } from '../types/navigation';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppRoutes() {
+  const { user } = useAuth();
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: false,
         animation: 'slide_from_right',
       }}
     >
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="CreateAppointment" component={CreateAppointmentScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
+      {!user ? (
+        // Rotas públicas
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
+      ) : (
+        // Rotas protegidas
+        <>
+          <Stack.Screen 
+            name="Home" 
+            component={HomeScreen}
+            options={{ title: 'Início' }}
+          />
+          <Stack.Screen 
+            name="RegisterMoto" 
+            component={RegisterMotosScreen}
+            options={{ title: 'Registrar Moto' }}
+          />
+          <Stack.Screen 
+            name="Dashboard" 
+            component={HomeScreen}
+            options={{ title: 'Dashboard' }}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 }

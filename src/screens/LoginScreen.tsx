@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaVie
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useAuth } from '../contexts/AuthContext';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -11,50 +12,58 @@ export const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
-  const handleLogin = () => {
+  const { signIn } = useAuth();
 
+  const handleLogin = async () => {
+    try {
+      await signIn({ email, password });
+      navigation.navigate('Home');
+    } catch (error) {
+      alert('Usuário ou senha inválidos');
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>LOGIN</Text>
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Usuário:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite seu e-mail"
-            placeholderTextColor="#999"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
+        <View style={styles.loginContainer}>
+          <Text style={styles.title}>LOGIN</Text>
+          
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Usuário:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu usuário"
+              placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Senha:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite sua senha"
+              placeholderTextColor="#999"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+
+          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+            <Text style={styles.buttonText}>{`>`}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.registerLink} 
+            onPress={() => navigation.navigate('Register')}
+          >
+            <Text style={styles.registerText}>Não possui login? Cadastre-se</Text>
+          </TouchableOpacity>
         </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Senha:</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Digite sua senha"
-            placeholderTextColor="#999"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.registerLink} 
-          onPress={() => navigation.navigate('Register')}
-        >
-          <Text style={styles.registerText}>Não possui login? Cadastre-se</Text>
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -63,56 +72,65 @@ export const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1A1A1A',
   },
   content: {
     flex: 1,
-    padding: 20,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginContainer: {
+    width: 300,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 25,
+    padding: 20,
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#00CF3A',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
+    width: 100,
+    height: 42,
   },
   inputContainer: {
-    marginBottom: 20,
+    width: '100%',
+    marginBottom: 15,
   },
   label: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    width: '100%',
+    height: 40,
+    backgroundColor: '#FFFFFF',
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333',
   },
   loginButton: {
+    width: 50,
     height: 50,
-    backgroundColor: '#007AFF',
-    borderRadius: 8,
+    backgroundColor: '#00CF3A',
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#FFFFFF',
+    fontSize: 24,
     fontWeight: 'bold',
   },
   registerLink: {
     marginTop: 20,
-    alignSelf: 'center',
   },
   registerText: {
-    color: '#007AFF',
+    color: '#00CF3A',
     fontSize: 14,
   },
 });

@@ -1,236 +1,434 @@
-import { FontAwesome } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, Modal, Dimensions, PanResponder, Animated, GestureResponderEvent, PanResponderGestureState } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React, { useState } from 'react';
-import { FlatList, RefreshControl, TouchableOpacity } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
 import styled from 'styled-components/native';
-import { HeaderContainer, HeaderTitle } from '../components/Header';
-import theme from '../styles/theme';
-import { Appointment } from '../types/appointments';
 import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
+import theme from '../styles/theme';
+import { HeaderContainer, HeaderTitle } from '../components/Header';
+import { ThemeType } from '../styles/theme';
+
+interface ThemedProps {
+  theme: ThemeType;
+}
+
+interface ColorProps {
+  color: string;
+}
+
+interface StatusProps {
+  status: string;
+}
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-const motos: Moto[] = [
-  {
-    id: '1',
-    modelo: 'Yamaha',
-    placa: 'ABC1234',
-    cod_tag: '123456',
-    status: 'Disponível',
-    posicaoX: '100',
-    posicaoY: '150',
-  },
-  {
-    id: '2',
-    modelo: 'Honda',
-    placa: 'XYZ5678',
-    cod_tag: '654321',
-    status: 'Manutencao',
-    posicaoX: '100',
-    posicaoY: '150',
-  },
-  {
-    id: '3',
-    modelo: 'Suzuki',
-    placa: 'LMN9101',
-    cod_tag: '789012',
-    status: 'Indisponível',
-    posicaoX: '100',
-    posicaoY: '150',
-  },
-];
+// Posições disponíveis no pátio
+const parkingSpots = {
+  top: { x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], y: 0 },
+  middle: { x: [0, 1, 2, 3, 4, 8, 9, 10, 11, 12], y: 1 },
+  bottom: { x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], y: 2 }
+};
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>('Todos');
+  const [motos, setMotos] = useState<Moto[]>([]);
+  const [selectedMoto, setSelectedMoto] = useState<Moto | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const loadAppointments = async () => {
-    try {
-      const storedAppointments = await AsyncStorage.getItem('appointments');
-      if (storedAppointments) {
-        setAppointments(JSON.parse(storedAppointments));
+  const pan = useRef(new Animated.ValueXY()).current;
+  const scale = useRef(new Animated.Value(1)).current;
+  const lastScale = useRef(1);
+  const initialPanValue = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const panListener = pan.addListener(value => {
+      initialPanValue.current = value;
+    });
+    
+    return () => {
+      pan.removeListener(panListener);
+    };
+  }, []);
+
+  const getPinchDistance = (event: GestureResponderEvent) => {
+    const touches = event.nativeEvent.touches;
+    if (touches.length < 2) return 0;
+
+    const dx = Math.abs(touches[0].pageX - touches[1].pageX);
+    const dy = Math.abs(touches[0].pageY - touches[1].pageY);
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+
+      onPanResponderGrant: () => {
+        pan.extractOffset();
+      },
+
+      onPanResponderMove: Animated.event(
+        [
+          null,
+          { dx: pan.x, dy: pan.y }
+        ],
+        { useNativeDriver: false }
+      ),
+
+      onPanResponderRelease: () => {
+        // Simply flatten the offset to keep the view where it was released
+        pan.flattenOffset();
       }
-    } catch (error) {
-      console.error('Erro ao carregar consultas:', error);
+    })
+  ).current;
+
+  // Mock de motos para teste
+  const mockMotos: Moto[] = [
+    {
+      id: '1',
+      modelo: 'Honda CB 500',
+      placa: 'ABC-1234',
+      cod_tag: 'TAG001',
+      status: 'Disponível',
+      posicaoX: '0',
+      posicaoY: '0',
+    },
+    {
+      id: '2',
+      modelo: 'Yamaha MT-07',
+      placa: 'DEF-5678',
+      cod_tag: 'TAG002',
+      status: 'Manutenção',
+      posicaoX: '2',
+      posicaoY: '1',
+    },
+    {
+      id: '3',
+      modelo: 'Kawasaki Ninja 400',
+      placa: 'GHI-9012',
+      cod_tag: 'TAG003',
+      status: 'Estacionada',
+      posicaoX: '8',
+      posicaoY: '1',
+    },
+  ];
+
+  useEffect(() => {
+    setMotos(mockMotos);
+  }, []);
+
+  const handleMotoPress = (moto: Moto) => {
+    setSelectedMoto(moto);
+    setShowModal(true);
+  };
+
+  const getSpotColor = (moto: Moto | undefined) => {
+    if (!moto) return '#2A2A2A';
+    switch (moto.status) {
+      case 'Disponível':
+        return '#00CF3A';
+      case 'Manutenção':
+        return '#FF0000';
+      default:
+        return '#FFAA00';
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      loadAppointments();
-    }, [])
-  );
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadAppointments();
-    setRefreshing(false);
-  };
-
-  const getDoctorInfo = (motoId: string): Moto | undefined => {
-    return motos.find(moto => moto.id === motoId);
-  };
-
-  const renderAppointment = ({ item }: { item: Appointment }) => {
-    const doctor = getDoctorInfo(item.doctorId);
-
+  const renderMotoSpot = (x: number, y: number) => {
+    const moto = motos.find(m => m.posicaoX === x.toString() && m.posicaoY === y.toString());
     return (
-      <AppointmentCard>
-        <InfoContainer>
-          <DateTime>{new Date(item.date).toLocaleDateString()} - {item.time}</DateTime>
-          <Description>{item.description}</Description>
-          <Status status={item.status}>
-            {item.status === 'pending' ? 'Pendente' : 'Confirmado'}
-          </Status>
-          <ActionButtons>
-            <ActionButton>
-              <Icon name="edit" type="material" size={20} color={theme.colors.primary} />
-            </ActionButton>
-            <ActionButton>
-              <Icon name="delete" type="material" size={20} color={theme.colors.error} />
-            </ActionButton>
-          </ActionButtons>
-        </InfoContainer>
-      </AppointmentCard>
+      <BikeSpot
+        key={`${x}-${y}`}
+        color={getSpotColor(moto)}
+        onPress={() => moto && handleMotoPress(moto)}
+      >
+        <BikeIcon>🏍</BikeIcon>
+      </BikeSpot>
     );
   };
 
   return (
     <Container>
       <HeaderContainer>
-        <HeaderTitle>Minhas Consultas</HeaderTitle>
+        <HeaderTitle>Pátio de Motos</HeaderTitle>
       </HeaderContainer>
 
-      <Content>
-        <Button
-          title="Agendar Nova Consulta"
-          icon={
-            <FontAwesome
-              name="calendar-plus-o"
-              size={20}
-              color="white"
-              style={{ marginRight: 8 }}
-            />
-          }
-          buttonStyle={{
-            backgroundColor: theme.colors.primary,
-            borderRadius: 8,
-            padding: 12,
-            marginBottom: theme.spacing.medium
+      <CardContainer>
+        <AnimatedCardContainer
+          {...panResponder.panHandlers}
+          style={{
+            transform: [
+              { translateX: pan.x },
+              { translateY: pan.y },
+              { scale: scale }
+            ]
           }}
-          onPress={() => navigation.navigate('RegisterMoto')}
-        />
+        >
+          <Card>
+            {/* Topo do pátio */}
+            <Row>
+              {parkingSpots.top.x.map(x => renderMotoSpot(x, parkingSpots.top.y))}
+            </Row>
 
-        <AppointmentList
-          data={appointments}
-          keyExtractor={(item: Appointment) => item.id}
-          renderItem={renderAppointment}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          ListEmptyComponent={
-            <EmptyText>Nenhuma consulta agendada</EmptyText>
-          }
-        />
-      </Content>
+            {/* Centro do pátio */}
+            <Row style={{ justifyContent: 'space-between', marginVertical: 30 }}>
+              <Column style={{ width: '30%' }}>
+                {[0, 1, 2].map(x => renderMotoSpot(x, parkingSpots.middle.y))}
+              </Column>
+              <EmptySpace />
+              <Column style={{ width: '30%' }}>
+                {[8, 9, 10].map(x => renderMotoSpot(x, parkingSpots.middle.y))}
+              </Column>
+            </Row>
+
+            {/* Base do pátio */}
+            <Row>
+              {parkingSpots.bottom.x.map(x => renderMotoSpot(x, parkingSpots.bottom.y))}
+            </Row>
+          </Card>
+        </AnimatedCardContainer>
+      </CardContainer>
+
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowModal(false)}
+      >
+        <ModalOverlay>
+          <ModalContent>
+            <ModalHeader>
+              <ModalTitle>Informações da Moto</ModalTitle>
+              <CloseButton onPress={() => setShowModal(false)}>
+                <CloseButtonText>✕</CloseButtonText>
+              </CloseButton>
+            </ModalHeader>
+
+            {selectedMoto && (
+              <ModalBody>
+                <InfoRow>
+                  <InfoLabel>Modelo:</InfoLabel>
+                  <InfoText>{selectedMoto.modelo}</InfoText>
+                </InfoRow>
+                <InfoRow>
+                  <InfoLabel>Placa:</InfoLabel>
+                  <InfoText>{selectedMoto.placa}</InfoText>
+                </InfoRow>
+                <InfoRow>
+                  <InfoLabel>Tag:</InfoLabel>
+                  <InfoText>{selectedMoto.cod_tag}</InfoText>
+                </InfoRow>
+                <InfoRow>
+                  <InfoLabel>Status:</InfoLabel>
+                  <StatusText status={selectedMoto.status}>{selectedMoto.status}</StatusText>
+                </InfoRow>
+              </ModalBody>
+            )}
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+
+      <BottomContainer>
+        <FilterDropdown>
+          <Text>Filtro:</Text>
+          <Picker value={selectedFilter} />
+        </FilterDropdown>
+        <AddButton onPress={() => navigation.navigate('RegisterMoto')}>
+          <AddButtonText>+ ADD MOTO</AddButtonText>
+        </AddButton>
+      </BottomContainer>
     </Container>
   );
 };
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${theme.colors.background};
+  background-color: #1A1A1A;
+  width: 100%;
 `;
 
-const Content = styled.View`
+const CardContainer = styled.View`
   flex: 1;
-  padding: ${theme.spacing.medium}px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
 `;
 
-const AppointmentList = styled(FlatList)`
+const AnimatedCardContainer = styled(Animated.View)`
+  width: 95%;
+  max-width: 500px;
+  background-color: #2A2A2A;
+  border-radius: 20px;
+  border: 2px solid #00CF3A;
+  
+  @media (min-width: 600px) {
+    max-width: 700px;
+  }
+`;
+
+const Card = styled.View`
+  min-height: 500px;
+  padding: 20px;
+  justify-content: space-between;
+
+  @media (min-width: 600px) {
+    min-height: 700px;
+    padding: 30px;
+  }
+`;
+
+const Row = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 15px 0;
+  flex-wrap: wrap;
+`;
+
+const Column = styled.View`
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+`;
+
+const BikeSpot = styled.TouchableOpacity<{ color: string }>`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: ${(props: { color: string }) => props.color};
+  justify-content: center;
+  align-items: center;
+  margin: 5px;
+  elevation: 3;
+  shadow-color: #000;
+  shadow-offset: 0px 2px;
+  shadow-opacity: 0.25;
+  shadow-radius: 3.84px;
+`;
+
+const BikeIcon = styled.Text`
+  font-size: 18px;
+`;
+
+const EmptySpace = styled.View`
+  width: 35%;
+  min-width: 80px;
+`;
+
+const BottomContainer = styled.View`
+  width: 100%;
+  padding: 15px 5%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const FilterDropdown = styled.View`
   flex: 1;
-`;
-
-const AppointmentCard = styled.View`
-  background-color: ${theme.colors.white};
-  border-radius: 8px;
-  padding: ${theme.spacing.medium}px;
-  margin-bottom: ${theme.spacing.medium}px;
+  max-width: 200px;
   flex-direction: row;
   align-items: center;
-  elevation: 2;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 4px;
-  shadow-offset: 0px 2px;
+  background-color: #2A2A2A;
+  border-radius: 8px;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #00CF3A;
 `;
 
-const DoctorImage = styled.Image`
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  margin-right: ${theme.spacing.medium}px;
-`;
-
-const InfoContainer = styled.View`
+const Picker = styled.View`
   flex: 1;
+  margin-left: 10px;
 `;
 
-const DoctorName = styled.Text`
-  font-size: ${theme.typography.subtitle.fontSize}px;
-  font-weight: ${theme.typography.subtitle.fontWeight};
-  color: ${theme.colors.text};
+const AddButton = styled.TouchableOpacity`
+  background-color: #00CF3A;
+  padding: 12px 24px;
+  border-radius: 25px;
 `;
 
-const DoctorSpecialty = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-bottom: 4px;
-`;
-
-const DateTime = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.primary};
-  margin-top: 4px;
-`;
-
-const Description = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
-  margin-top: 4px;
-`;
-
-const Status = styled.Text<{ status: string }>`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { status: string }) => props.status === 'pending' ? theme.colors.error : theme.colors.success};
-  margin-top: 4px;
+const AddButtonText = styled.Text`
+  color: #FFFFFF;
   font-weight: bold;
 `;
 
-const ActionButtons = styled.View`
+const ModalOverlay = styled.View`
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+`;
+
+const ModalContent = styled.View`
+  width: 300px;
+  background-color: #2A2A2A;
+  border-radius: 20px;
+  padding: 20px;
+  border: 2px solid #00CF3A;
+`;
+
+const ModalHeader = styled.View`
   flex-direction: row;
-  justify-content: flex-end;
-  margin-top: ${theme.spacing.small}px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom-width: 1px;
+  border-bottom-color: #00CF3A;
+  padding-bottom: 10px;
 `;
 
-const ActionButton = styled(TouchableOpacity)`
-  padding: ${theme.spacing.small}px;
-  margin-left: ${theme.spacing.small}px;
+const ModalTitle = styled.Text`
+  color: #00CF3A;
+  font-size: 18px;
+  font-weight: bold;
 `;
 
-const EmptyText = styled.Text`
-  text-align: center;
-  color: ${theme.colors.text};
-  opacity: 0.6;
-  margin-top: ${theme.spacing.large}px;
+const CloseButton = styled.TouchableOpacity`
+  padding: 5px;
+`;
+
+const CloseButtonText = styled.Text`
+  color: #00CF3A;
+  font-size: 20px;
+`;
+
+const ModalBody = styled.View`
+  gap: 10px;
+`;
+
+const InfoRow = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const InfoLabel = styled.Text`
+  color: #FFFFFF;
+  opacity: 0.8;
+`;
+
+const InfoText = styled.Text`
+  color: #FFFFFF;
+`;
+
+const StatusText = styled.Text<StatusProps>`
+  color: ${(props: StatusProps) => {
+    switch (props.status) {
+      case 'Disponível':
+        return '#00CF3A';
+      case 'Manutenção':
+        return '#FF0000';
+      default:
+        return '#FFAA00';
+    }
+  }};
+  font-weight: bold;
 `;
 
 export default HomeScreen;
