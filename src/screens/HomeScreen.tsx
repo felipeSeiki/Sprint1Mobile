@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, Modal, PanResponder, Animated, GestureResponderEvent } from 'react-native';
+import { Text, Modal, PanResponder, Animated, GestureResponderEvent, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import styled from 'styled-components/native';
 import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
 import theme from '../styles/theme';
 import { HeaderContainer } from '../components/Header';
+import { useAuth } from '../contexts/AuthContext';
 
 interface StatusProps {
   status: string;
@@ -27,6 +28,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [motos, setMotos] = useState<Moto[]>([]);
   const [selectedMoto, setSelectedMoto] = useState<Moto | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const { signOut } = useAuth();
 
   const pan = useRef(new Animated.ValueXY()).current;
   const scale = useRef(new Animated.Value(1)).current;
@@ -107,6 +109,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setShowModal(true);
   };
 
+  
+  const handleLogOut = () => {
+    signOut();
+    navigation.navigate('Login')
+  };
+
   const getSpotColor = (moto: Moto | undefined) => {
     if (!moto) return '#2A2A2A';
     switch (moto.status) {
@@ -134,7 +142,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-      <HeaderContainer/>
+       <HeaderContainer>
+        <TouchableOpacity
+          style={styles.logOutButton}
+          onPress={handleLogOut}
+        >
+          <Text>Sair</Text>
+        </TouchableOpacity>
+      </HeaderContainer>
 
       <CardContainer>
         <AnimatedCardContainer
@@ -411,4 +426,26 @@ const StatusText = styled.Text<StatusProps>`
   font-weight: bold;
 `;
 
+
+const styles = StyleSheet.create({
+  logOutButton: {
+    height: 30,
+    width: 50,
+    backgroundColor: '#00CF3A',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  }
+});
 export default HomeScreen;

@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HeaderContainer } from '../components/Header';
+import { useAuth } from '../contexts/AuthContext';
 
 type RegisterMotosScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RegisterMoto'>;
 
@@ -21,6 +22,8 @@ const { width } = Dimensions.get('window');
 const isSmallDevice = width < 375;
 
 export const RegisterMotosScreen: React.FC = () => {
+  const { signOut } = useAuth();
+
   const [formData, setFormData] = useState({
     modelo: '',
     placa: '',
@@ -44,9 +47,21 @@ export const RegisterMotosScreen: React.FC = () => {
     // Lógica para cadastrar a moto
   };
 
+  const handleLogOut = () => {
+    signOut();
+    navigation.navigate('Login')
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderContainer/>
+      <HeaderContainer>
+        <TouchableOpacity
+          style={styles.logOutButton}
+          onPress={handleLogOut}
+        >
+          <Text>Sair</Text>
+        </TouchableOpacity>
+      </HeaderContainer>
       <ScrollView 
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -98,35 +113,6 @@ export const RegisterMotosScreen: React.FC = () => {
               value={formData.status}
               onChangeText={(text) => handleChange('status', text)}
             />
-          </View>
-
-          <View style={styles.positionContainer}>
-            <Text style={styles.label}>Posição:</Text>
-            <View style={styles.positionInputs}>
-              <View style={styles.positionGroup}>
-                <Text style={styles.positionLabel}>X:</Text>
-                <TextInput
-                  style={[styles.input, styles.positionInput]}
-                  placeholder="Posição X"
-                  placeholderTextColor="#999"
-                  keyboardType="numeric"
-                  value={formData.posicaoX}
-                  onChangeText={(text) => handleChange('posicaoX', text)}
-                />
-              </View>
-              
-              <View style={styles.positionGroup}>
-                <Text style={styles.positionLabel}>Y:</Text>
-                <TextInput
-                  style={[styles.input, styles.positionInput]}
-                  placeholder="Posição Y"
-                  placeholderTextColor="#999"
-                  keyboardType="numeric"
-                  value={formData.posicaoY}
-                  onChangeText={(text) => handleChange('posicaoY', text)}
-                />
-              </View>
-            </View>
           </View>
 
           <TouchableOpacity 
@@ -220,6 +206,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 25,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+  logOutButton: {
+    height: 30,
+    width: 50,
+    backgroundColor: '#00CF3A',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
     ...Platform.select({
       ios: {
         shadowColor: '#000',
