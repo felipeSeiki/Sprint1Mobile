@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -78,18 +78,29 @@ export const RegisterScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <HeaderContainer/>
-      <CardContainer>
-      <AnimatedCardContainer {...panResponder.panHandlers}
-          style={{
-            transform: [
-              { translateY: pan.y },
-              { scale: scale }
-            ]
-          }}>
-        <View style={styles.content}>
-          <Text style={styles.title}>Cadastro</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <HeaderContainer/>
+        
+        <CardContainer>
+          <AnimatedCardContainer {...panResponder.panHandlers}
+            style={{
+              transform: [
+                { translateY: pan.y },
+                { scale: scale }
+              ]
+            }}>
+            
+            <ScrollView 
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.innerContent}>
+                <Text style={styles.title}>Cadastro</Text>
           
           <View style={styles.formGroup}>
             <Text style={styles.label}>Usuário:</Text>
@@ -173,19 +184,21 @@ export const RegisterScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>CADASTRAR</Text>
-          </TouchableOpacity>
-
+                <Text style={styles.buttonText}>CADASTRAR</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
           <TouchableOpacity 
             style={styles.loginLink} 
             onPress={() => navigation.navigate('Login')}
           >
             <Text style={styles.loginText}>Já possui conta? Faça login</Text>
           </TouchableOpacity>
-        </View>
-      </AnimatedCardContainer>        
+          
+        </AnimatedCardContainer>
       </CardContainer>
     </SafeAreaView>
+  </KeyboardAvoidingView>
   );
 };
 
@@ -206,6 +219,7 @@ const CardContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding: 20px;
+  height: 450px;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -213,9 +227,19 @@ const CardContainer = styled.View`
 `;
 
 const styles = StyleSheet.create({
-  container: {
+   container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
+  },
+  safeArea: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 0, // O padding bottom será aplicado pelo loginLink
+  },
+  innerContent: {
+    paddingBottom: 20, // Espaço para o botão de login
   },
   scrollContainer: {
     flexGrow: 1,
