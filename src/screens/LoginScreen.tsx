@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { HeaderContainer } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
@@ -25,6 +26,8 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <HeaderContainer/>
+
       <View style={styles.content}>
         <View style={styles.loginContainer}>
           <Text style={styles.title}>LOGIN</Text>
@@ -115,7 +118,7 @@ const styles = StyleSheet.create({
   loginButton: {
     width: 50,
     height: 50,
-    backgroundColor: '#00CF3A',
+    backgroundColor: '#2F8028',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
@@ -130,7 +133,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   registerText: {
-    color: '#00CF3A',
+    color: '#037325',
     fontSize: 14,
   },
 });

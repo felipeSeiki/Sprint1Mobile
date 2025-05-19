@@ -1,20 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, Dimensions, PanResponder, Animated, GestureResponderEvent, PanResponderGestureState } from 'react-native';
+import { Text, Modal, PanResponder, Animated, GestureResponderEvent } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import styled from 'styled-components/native';
 import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
 import theme from '../styles/theme';
-import { HeaderContainer, HeaderTitle } from '../components/Header';
-import { ThemeType } from '../styles/theme';
-
-interface ThemedProps {
-  theme: ThemeType;
-}
-
-interface ColorProps {
-  color: string;
-}
+import { HeaderContainer } from '../components/Header';
 
 interface StatusProps {
   status: string;
@@ -51,15 +42,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       pan.removeListener(panListener);
     };
   }, []);
-
-  const getPinchDistance = (event: GestureResponderEvent) => {
-    const touches = event.nativeEvent.touches;
-    if (touches.length < 2) return 0;
-
-    const dx = Math.abs(touches[0].pageX - touches[1].pageX);
-    const dy = Math.abs(touches[0].pageY - touches[1].pageY);
-    return Math.sqrt(dx * dx + dy * dy);
-  };
 
   const panResponder = useRef(
     PanResponder.create({
@@ -152,9 +134,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-      <HeaderContainer>
-        <HeaderTitle>Pátio de Motos</HeaderTitle>
-      </HeaderContainer>
+      <HeaderContainer/>
 
       <CardContainer>
         <AnimatedCardContainer

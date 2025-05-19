@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { HeaderContainer } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
+import styled from 'styled-components/native';
 
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
@@ -18,6 +20,9 @@ export const RegisterScreen: React.FC = () => {
     estado: ''
   });
 
+  const pan = useRef(new Animated.ValueXY()).current;
+  const scale = useRef(new Animated.Value(1)).current;
+
   const navigation = useNavigation<RegisterScreenNavigationProp>();
 
   const handleChange = (name: string, value: string) => {
@@ -28,6 +33,30 @@ export const RegisterScreen: React.FC = () => {
   };
 
   const { register } = useAuth();
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+
+      onPanResponderGrant: () => {
+        pan.extractOffset();
+      },
+
+      onPanResponderMove: Animated.event(
+        [
+          null,
+          { dx: pan.x, dy: pan.y }
+        ],
+        { useNativeDriver: false }
+      ),
+
+      onPanResponderRelease: () => {
+        // Simply flatten the offset to keep the view where it was released
+        pan.flattenOffset();
+      }
+    })
+  ).current;
   
   const handleSubmit = async () => {
     try {
@@ -50,7 +79,15 @@ export const RegisterScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <HeaderContainer/>
+      <CardContainer>
+      <AnimatedCardContainer {...panResponder.panHandlers}
+          style={{
+            transform: [
+              { translateY: pan.y },
+              { scale: scale }
+            ]
+          }}>
         <View style={styles.content}>
           <Text style={styles.title}>Cadastro</Text>
           
@@ -146,15 +183,39 @@ export const RegisterScreen: React.FC = () => {
             <Text style={styles.loginText}>Já possui conta? Faça login</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
+      </AnimatedCardContainer>        
+      </CardContainer>
     </SafeAreaView>
   );
 };
 
+const AnimatedCardContainer = styled(Animated.View)`
+  width: 95%;
+  max-width: 500px;
+  background-color: #2A2A2A;
+  border-radius: 20px;
+  border: 2px solid #00CF3A;
+  
+  @media (min-width: 600px) {
+    max-width: 700px;
+  }
+`;
+
+const CardContainer = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+`;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1A1A1A',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -167,7 +228,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#00CF3A',
     textAlign: 'center',
     marginBottom: 30,
   },
@@ -176,7 +237,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    color: '#333',
+    color: '#fff',
     marginBottom: 8,
   },
   input: {
@@ -186,12 +247,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 15,
     fontSize: 16,
-    color: '#333',
+    color: '#000',
     backgroundColor: '#f9f9f9',
   },
   submitButton: {
     height: 50,
-    backgroundColor: '#34A853', // Verde do Google
+    backgroundColor: '#2F8028', // Verde do Google
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -199,7 +260,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: '#2F8028',
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -207,7 +268,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   loginText: {
-    color: '#007AFF',
+    color: '#037325',
     fontSize: 14,
   },
 });
