@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView } from 'react-native';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  SafeAreaView, 
+  ScrollView,
+  Dimensions,
+  Platform
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { HeaderContainer } from '../components/Header';
 
 type RegisterMotosScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RegisterMoto'>;
+
+const { width } = Dimensions.get('window');
+const isSmallDevice = width < 375;
 
 export const RegisterMotosScreen: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -32,7 +46,11 @@ export const RegisterMotosScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <HeaderContainer/>
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.content}>
           <Text style={styles.title}>Motos</Text>
           
@@ -85,11 +103,11 @@ export const RegisterMotosScreen: React.FC = () => {
           <View style={styles.positionContainer}>
             <Text style={styles.label}>Posição:</Text>
             <View style={styles.positionInputs}>
-              <View style={styles.positionInputWrapper}>
+              <View style={styles.positionGroup}>
                 <Text style={styles.positionLabel}>X:</Text>
                 <TextInput
                   style={[styles.input, styles.positionInput]}
-                  placeholder="X"
+                  placeholder="Posição X"
                   placeholderTextColor="#999"
                   keyboardType="numeric"
                   value={formData.posicaoX}
@@ -97,11 +115,11 @@ export const RegisterMotosScreen: React.FC = () => {
                 />
               </View>
               
-              <View style={styles.positionInputWrapper}>
+              <View style={styles.positionGroup}>
                 <Text style={styles.positionLabel}>Y:</Text>
                 <TextInput
                   style={[styles.input, styles.positionInput]}
-                  placeholder="Y"
+                  placeholder="Posição Y"
                   placeholderTextColor="#999"
                   keyboardType="numeric"
                   value={formData.posicaoY}
@@ -111,7 +129,11 @@ export const RegisterMotosScreen: React.FC = () => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <TouchableOpacity 
+            style={styles.submitButton} 
+            onPress={handleSubmit}
+            activeOpacity={0.8}
+          >
             <Text style={styles.buttonText}>CADASTRAR MOTO</Text>
           </TouchableOpacity>
         </View>
@@ -123,74 +145,96 @@ export const RegisterMotosScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1A1A1A',
   },
   scrollContainer: {
     flexGrow: 1,
+    paddingVertical: 20,
   },
   content: {
     flex: 1,
-    padding: 20,
-    paddingTop: 30,
+    backgroundColor: '#2A2A2A',
+    borderRadius: 12,
+    padding: isSmallDevice ? 15 : 25,
+    marginHorizontal: isSmallDevice ? 10 : 20,
+    borderColor: '#00CF3A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   title: {
-    fontSize: 24,
+    fontSize: isSmallDevice ? 22 : 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#00CF3A',
     textAlign: 'center',
     marginBottom: 30,
+    marginTop: 10,
   },
   formGroup: {
-    marginBottom: 20,
+    marginBottom: isSmallDevice ? 15 : 20,
   },
   label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
+    fontSize: isSmallDevice ? 14 : 16,
+    color: '#FFFFFF',
+    marginBottom: 6,
     fontWeight: '500',
   },
   input: {
-    height: 50,
+    height: isSmallDevice ? 45 : 50,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#555',
     borderRadius: 8,
     paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#f9f9f9',
+    fontSize: isSmallDevice ? 14 : 16,
+    color: '#FFFFFF',
+    backgroundColor: '#333333',
   },
   positionContainer: {
-    marginBottom: 25,
+    marginBottom: isSmallDevice ? 20 : 25,
   },
   positionInputs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 5,
   },
-  positionInputWrapper: {
+  positionGroup: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '48%',
   },
   positionLabel: {
     marginRight: 10,
-    fontSize: 16,
-    color: '#333',
+    fontSize: isSmallDevice ? 14 : 16,
+    color: '#FFFFFF',
     width: 20,
+    fontWeight: '500',
   },
   positionInput: {
     flex: 1,
   },
   submitButton: {
-    height: 50,
-    backgroundColor: '#FF9500', // Cor laranja para diferenciação
+    height: isSmallDevice ? 48 : 52,
+    backgroundColor: '#00CF3A',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 25,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: '#1A1A1A',
+    fontSize: isSmallDevice ? 15 : 16,
     fontWeight: 'bold',
   },
 });
