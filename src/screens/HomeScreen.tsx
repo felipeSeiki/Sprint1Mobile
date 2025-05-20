@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
 import theme from '../styles/theme';
-import { HeaderContainer } from '../components/Header';
+import Header from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 
 interface StatusProps {
@@ -142,14 +142,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-       <HeaderContainer>
-        <TouchableOpacity
-          style={styles.logOutButton}
-          onPress={handleLogOut}
-        >
-          <Text>Sair</Text>
-        </TouchableOpacity>
-      </HeaderContainer>
+       <Header>
+      </Header>
 
       <CardContainer>
         <AnimatedCardContainer

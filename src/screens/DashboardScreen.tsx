@@ -246,7 +246,6 @@ const AppointmentCard = styled(ListItem)`
   margin-bottom: 10px;
   padding: 15px;
   border-width: 1px;
-  border-color: ${theme.colors.border};
 `;
 
 const LoadingText = styled.Text`

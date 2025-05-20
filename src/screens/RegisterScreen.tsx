@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,6 +10,8 @@ import styled from 'styled-components/native';
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 export const RegisterScreen: React.FC = () => {
+  const { signOut } = useAuth();
+
   const [formData, setFormData] = useState({
     usuario: '',
     senha: '',
@@ -77,30 +79,31 @@ export const RegisterScreen: React.FC = () => {
     }
   };
 
+  const handleLogOut = () => {
+    signOut();
+    navigation.navigate('Login')
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <HeaderContainer/>
-        
-        <CardContainer>
-          <AnimatedCardContainer {...panResponder.panHandlers}
-            style={{
-              transform: [
-                { translateY: pan.y },
-                { scale: scale }
-              ]
-            }}>
-            
-            <ScrollView 
-              contentContainerStyle={styles.scrollContent}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              <View style={styles.innerContent}>
-                <Text style={styles.title}>Cadastro</Text>
+    <SafeAreaView style={styles.container}>
+      <HeaderContainer>
+      <TouchableOpacity
+          style={styles.logOutButton}
+          onPress={handleLogOut}
+        >
+          <Text>Sair</Text>
+        </TouchableOpacity>
+      </HeaderContainer>
+      <CardContainer>
+      <AnimatedCardContainer {...panResponder.panHandlers}
+          style={{
+            transform: [
+              { translateY: pan.y },
+              { scale: scale }
+            ]
+          }}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Cadastro</Text>
           
           <View style={styles.formGroup}>
             <Text style={styles.label}>Usuário:</Text>
@@ -184,21 +187,19 @@ export const RegisterScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>CADASTRAR</Text>
-              </TouchableOpacity>
-            </View>
-          </ScrollView>
+            <Text style={styles.buttonText}>CADASTRAR</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity 
             style={styles.loginLink} 
             onPress={() => navigation.navigate('Login')}
           >
             <Text style={styles.loginText}>Já possui conta? Faça login</Text>
           </TouchableOpacity>
-          
-        </AnimatedCardContainer>
+        </View>
+      </AnimatedCardContainer>        
       </CardContainer>
     </SafeAreaView>
-  </KeyboardAvoidingView>
   );
 };
 
@@ -219,7 +220,7 @@ const CardContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding: 20px;
-  height: 450px;
+  height: 60px;
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
@@ -227,19 +228,9 @@ const CardContainer = styled.View`
 `;
 
 const styles = StyleSheet.create({
-   container: {
+  container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
-  },
-  safeArea: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 0, // O padding bottom será aplicado pelo loginLink
-  },
-  innerContent: {
-    paddingBottom: 20, // Espaço para o botão de login
   },
   scrollContainer: {
     flexGrow: 1,
@@ -282,6 +273,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
     marginBottom: 20,
+  },
+  logOutButton: {
+    height: 30,
+    width: 50,
+    backgroundColor: '#00CF3A',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   buttonText: {
     color: '#2F8028',
