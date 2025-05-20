@@ -31,7 +31,7 @@ export const RegisterScreen: React.FC = () => {
 
   const { register } = useAuth();
 
-  
+
   const handleSubmit = async () => {
     try {
       await register({
@@ -44,19 +44,19 @@ export const RegisterScreen: React.FC = () => {
         cidade: formData.cidade,
         estado: formData.estado
       });
-      // Registro bem sucedido, a navegação será automática
+
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       alert('Erro ao realizar cadastro: ' + errorMessage);
     }
-  };  return (
+  }; return (
     <SafeAreaView style={styles.container}>
       <HeaderContainer>
-        <Image 
+        <Image
           source={require('../../assets/MottuLogo.png')}
           style={styles.logo}
-        /> 
-      </HeaderContainer>      <ScrollView 
+        />
+      </HeaderContainer>      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -67,7 +67,7 @@ export const RegisterScreen: React.FC = () => {
       >
         <FormCard>
           <Text style={styles.title}>Cadastro</Text>
-          
+
           <View style={styles.formGroup}>
             <Text style={styles.label}>Usuário:</Text>
             <TextInput
@@ -153,8 +153,8 @@ export const RegisterScreen: React.FC = () => {
             <Text style={styles.buttonText}>CADASTRAR</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.loginLink} 
+          <TouchableOpacity
+            style={styles.loginLink}
             onPress={() => navigation.navigate('Login')}
           >
             <Text style={styles.loginText}>Já possui conta? Faça login</Text>
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
-  },  scrollView: {
+  }, scrollView: {
     flex: 1,
     width: '100%',
   },
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     }),
   },
   buttonText: {
-    color: '#2F8028',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },

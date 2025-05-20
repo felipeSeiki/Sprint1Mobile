@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal, Platform, Image } from 'react-native';
 import styled from 'styled-components/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -71,10 +71,21 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     <Container>
       {/* Header */}
       <HeaderContainer>
-        <Title>Dashboard de Motos</Title>
-        <LogoutButton onPress={handleLogOut}>
-          <LogoutText>Sair</LogoutText>
-        </LogoutButton>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Home')}
+          style={{ backgroundColor: 'transparent' }}
+        >
+          <Image
+            source={require('../../assets/MottuLogo.png')}
+            style={styles.logo}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logOutButton}
+          onPress={handleLogOut}
+        >
+          <Text style={styles.logOutText}>Sair</Text>
+        </TouchableOpacity>
       </HeaderContainer>
 
       {/* Conteúdo principal */}
@@ -85,12 +96,12 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             <SummaryNumber>{motos.length}</SummaryNumber>
             <SummaryLabel>Total de Motos</SummaryLabel>
           </SummaryCard>
-          
+
           <SummaryCard>
             <SummaryNumber>{motos.filter(m => m.status === 'Disponível').length}</SummaryNumber>
             <SummaryLabel>Disponíveis</SummaryLabel>
           </SummaryCard>
-          
+
           <SummaryCard>
             <SummaryNumber>{motos.filter(m => m.status === 'Manutenção').length}</SummaryNumber>
             <SummaryLabel>Em Manutenção</SummaryLabel>
@@ -105,7 +116,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
               <FilterText>{selectedFilter}</FilterText>
             </FilterButton>
           </FilterContainer>
-          
+
           <AddButton onPress={() => navigation.navigate('RegisterMoto')}>
             <AddButtonText>+ ADD MOTO</AddButtonText>
           </AddButton>
@@ -118,7 +129,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             <HeaderText>Placa</HeaderText>
             <HeaderText>Status</HeaderText>
           </ListHeader>
-          
+
           <ScrollView>
             {motos.map(moto => (
               <MotoItem key={moto.id} onPress={() => handleMotoPress(moto)}>
@@ -148,24 +159,24 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
                 <CloseText>✕</CloseText>
               </CloseButton>
             </ModalHeader>
-            
+
             {selectedMoto && (
               <ModalBody>
                 <DetailRow>
                   <DetailLabel>Modelo:</DetailLabel>
                   <DetailValue>{selectedMoto.modelo}</DetailValue>
                 </DetailRow>
-                
+
                 <DetailRow>
                   <DetailLabel>Placa:</DetailLabel>
                   <DetailValue>{selectedMoto.placa}</DetailValue>
                 </DetailRow>
-                
+
                 <DetailRow>
                   <DetailLabel>Tag:</DetailLabel>
                   <DetailValue>{selectedMoto.cod_tag}</DetailValue>
                 </DetailRow>
-                
+
                 <DetailRow>
                   <DetailLabel>Status:</DetailLabel>
                   <StatusValue status={selectedMoto.status}>
@@ -181,10 +192,47 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   );
 };
 
-// Estilização com styled-components
+const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+    marginLeft: -25, // Para alinhar melhor o logo
+  },
+  logOutText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#1A1A1A',
+  },
+  logOutButton: {
+    height: 30,
+    width: 50,
+    backgroundColor: '#00CF3A',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
+  },
+
+});
+
 const Container = styled.View`
   flex: 1;
-  background-color: #F5F7FA;
+  background-color: #1A1A1A;
 `;
 
 const Header = styled.View`
@@ -223,7 +271,8 @@ const SummaryContainer = styled.View`
 `;
 
 const SummaryCard = styled.View`
-  background-color: white;
+  background-color: #2A2A2A;
+  border: 1px solid #00CF3A;
   border-radius: 8px;
   padding: 15px;
   width: 30%;
@@ -238,12 +287,12 @@ const SummaryCard = styled.View`
 const SummaryNumber = styled.Text`
   font-size: 24px;
   font-weight: bold;
-  color: #1A365D;
+  color: #00CF3A;
 `;
 
 const SummaryLabel = styled.Text`
   font-size: 12px;
-  color: #718096;
+  color: #FFFFFF;
   margin-top: 5px;
 `;
 
@@ -260,22 +309,22 @@ const FilterContainer = styled.View`
 
 const FilterLabel = styled.Text`
   margin-right: 10px;
-  color: #4A5568;
+  color: #FFFFFF;
 `;
 
 const FilterButton = styled.TouchableOpacity`
-  background-color: white;
+  background-color: #2A2A2A;
   padding: 10px 15px;
   border-radius: 20px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #00CF3A;
 `;
 
 const FilterText = styled.Text`
-  color: #1A365D;
+  color: #FFFFFF;
 `;
 
 const AddButton = styled.TouchableOpacity`
-  background-color: #4299E1;
+  background-color: #00CF3A;
   padding: 10px 20px;
   border-radius: 20px;
 `;
@@ -287,7 +336,8 @@ const AddButtonText = styled.Text`
 
 const MotoList = styled.View`
   flex: 1;
-  background-color: white;
+  background-color: #2A2A2A;
+  border: 1px solid #00CF3A;
   border-radius: 8px;
   shadow-color: #000;
   shadow-offset: 0 2px;
@@ -301,13 +351,13 @@ const ListHeader = styled.View`
   justify-content: space-between;
   padding: 15px;
   border-bottom-width: 1px;
-  border-bottom-color: #E2E8F0;
-  background-color: #F7FAFC;
+  border-bottom-color: #00CF3A;
+  background-color: #1A1A1A;
 `;
 
 const HeaderText = styled.Text`
   font-weight: bold;
-  color: #4A5568;
+  color: #FFFFFF;
   flex: 1;
   text-align: center;
 `;
@@ -317,13 +367,13 @@ const MotoItem = styled.TouchableOpacity`
   justify-content: space-between;
   padding: 15px;
   border-bottom-width: 1px;
-  border-bottom-color: #E2E8F0;
+  border-bottom-color: #00CF3A;
 `;
 
 const MotoText = styled.Text`
   flex: 1;
   text-align: center;
-  color: #2D3748;
+  color: #FFFFFF;
 `;
 
 interface StatusBadgeProps {
@@ -352,9 +402,10 @@ const ModalOverlay = styled.View`
 
 const ModalContent = styled.View`
   width: 80%;
-  background-color: white;
-  border-radius: 8px;
+  background-color: #2A2A2A;
+  border-radius: 20px;
   padding: 20px;
+  border: 2px solid #00CF3A;
 `;
 
 const ModalHeader = styled.View`
@@ -367,7 +418,7 @@ const ModalHeader = styled.View`
 const ModalTitle = styled.Text`
   font-size: 18px;
   font-weight: bold;
-  color: #1A365D;
+  color: #00CF3A;
 `;
 
 const CloseButton = styled.TouchableOpacity`
@@ -376,7 +427,7 @@ const CloseButton = styled.TouchableOpacity`
 
 const CloseText = styled.Text`
   font-size: 18px;
-  color: #718096;
+  color: #00CF3A;
 `;
 
 const ModalBody = styled.View``;
@@ -389,11 +440,12 @@ const DetailRow = styled.View`
 
 const DetailLabel = styled.Text`
   font-weight: bold;
-  color: #4A5568;
+  color: #FFFFFF;
+  opacity: 0.8;
 `;
 
 const DetailValue = styled.Text`
-  color: #2D3748;
+  color: #FFFFFF;
 `;
 
 const StatusValue = styled.Text<{ status: string }>`

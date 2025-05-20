@@ -39,7 +39,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const panListener = pan.addListener(value => {
       initialPanValue.current = value;
     });
-    
+
     return () => {
       pan.removeListener(panListener);
     };
@@ -109,7 +109,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setShowModal(true);
   };
 
-  
+
   const handleLogOut = () => {
     signOut();
     navigation.navigate('Login')
@@ -143,10 +143,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <Container>
       <HeaderContainer>
-        <Image 
+        <Image
           source={require('../../assets/MottuLogo.png')}
           style={styles.logo}
-        />        
+        />
         <TouchableOpacity
           style={styles.logOutButton}
           onPress={handleLogOut}
@@ -434,9 +434,18 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: -25, // Para alinhar melhor o logo
   },
+  logOutText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#1A1A1A',
+  },
   logOutButton: {
-    height: 35,
-    paddingHorizontal: 15,
+    height: 30,
+    width: 50,
     backgroundColor: '#00CF3A',
     borderRadius: 8,
     justifyContent: 'center',
@@ -453,10 +462,5 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  logOutText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 14,
-  }
 });
 export default HomeScreen;

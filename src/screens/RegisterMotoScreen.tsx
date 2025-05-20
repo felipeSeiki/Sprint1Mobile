@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
-  SafeAreaView, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
   ScrollView,
   Dimensions,
-  Platform
+  Platform,
+  Image
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
@@ -56,19 +57,28 @@ export const RegisterMotosScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <HeaderContainer>
         <TouchableOpacity
+          onPress={() => navigation.navigate('Home')}
+          style={{ backgroundColor: 'transparent' }}
+        >
+          <Image
+            source={require('../../assets/MottuLogo.png')}
+            style={styles.logo}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.logOutButton}
           onPress={handleLogOut}
         >
-          <Text>Sair</Text>
+          <Text style={styles.logOutText}>Sair</Text>
         </TouchableOpacity>
       </HeaderContainer>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.content}>
           <Text style={styles.title}>Motos</Text>
-          
+
           <View style={styles.formGroup}>
             <Text style={styles.label}>Modelo:</Text>
             <TextInput
@@ -115,8 +125,8 @@ export const RegisterMotosScreen: React.FC = () => {
             />
           </View>
 
-          <TouchableOpacity 
-            style={styles.submitButton} 
+          <TouchableOpacity
+            style={styles.submitButton}
             onPress={handleSubmit}
             activeOpacity={0.8}
           >
@@ -129,6 +139,17 @@ export const RegisterMotosScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+    marginLeft: -25, // Para alinhar melhor o logo
+  },
+  logOutText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
   container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
