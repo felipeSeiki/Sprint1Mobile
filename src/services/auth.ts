@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
+import { Moto } from '../types/motos';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -161,4 +162,36 @@ export const authService = {
       console.error('Erro ao carregar usuários registrados:', error);
     }
   },
+};
+
+export const motoService = {
+  // Buscar todas as motos
+  getAllMotos: () => mockMotos,
+
+  // Buscar moto por ID
+  getMotoById: (id: string) => mockMotos.find(moto => moto.id === id),
+
+  // Buscar motos por status
+  getMotosByStatus: (status: string) => 
+    mockMotos.filter(moto => moto.status === status),
+
+  // Adicionar nova moto (simulação)
+  addMoto: (newMoto: Omit<Moto, 'id'>) => {
+    const moto = {
+      ...newMoto,
+      id: String(mockMotos.length + 1)
+    };
+    mockMotos.push(moto);
+    return moto;
+  },
+
+  // Atualizar status da moto
+  updateMotoStatus: (id: string, status: string) => {
+    const moto = mockMotos.find(m => m.id === id);
+    if (moto) {
+      moto.status = status;
+      return moto;
+    }
+    return null;
+  }
 };
