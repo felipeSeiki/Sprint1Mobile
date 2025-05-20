@@ -34,6 +34,12 @@ export const RegisterScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+
+      if (!formData.usuario || !formData.senha || !formData.cep || !formData.logradouro || !formData.numero || !formData.cidade || !formData.estado) {
+        alert('Por favor, preencha todos os campos obrigatórios');
+        return
+      }
+
       await register({
         name: formData.usuario,
         email: formData.usuario,

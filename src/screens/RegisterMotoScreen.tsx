@@ -16,6 +16,7 @@ import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { HeaderContainer } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
+import { motoService } from '../services/auth';
 
 type RegisterMotosScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RegisterMoto'>;
 
@@ -24,6 +25,38 @@ const isSmallDevice = width < 375;
 
 export const RegisterMotosScreen: React.FC = () => {
   const { signOut } = useAuth();
+
+  const availableSpots = {
+    top: { x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], y: 0 },
+    middle: { x: [0, 1, 2, 3, 4, 8, 9, 10, 11, 12], y: 1 },
+    bottom: { x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], y: 2 }
+  };
+
+  const getRandomPosition = () => {
+    const existingMotos = motoService.getAllMotos();
+
+    const allPositions: Array<{ x: number, y: number }> = [];
+
+    Object.entries(availableSpots).forEach(([_, value]) => {
+      value.x.forEach(x => {
+        allPositions.push({ x, y: value.y });
+      });
+    });
+
+    const availablePositions = allPositions.filter(pos =>
+      !existingMotos.some(moto =>
+        moto.posicaoX === String(pos.x) &&
+        moto.posicaoY === String(pos.y)
+      )
+    );
+
+    if (availablePositions.length === 0) {
+      throw new Error('Não há posições disponíveis no pátio');
+    }
+
+    const randomIndex = Math.floor(Math.random() * availablePositions.length);
+    return availablePositions[randomIndex];
+  };
 
   const [formData, setFormData] = useState({
     modelo: '',
@@ -43,11 +76,35 @@ export const RegisterMotosScreen: React.FC = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log('Dados da moto:', formData);
-    // Lógica para cadastrar a moto
-  };
+  const handleSubmit = async () => {
+    try {
+      if (!formData.modelo || !formData.placa || !formData.codigoTag || !formData.status) {
+        alert('Por favor, preencha todos os campos obrigatórios');
+        return;
+      }
 
+      const position = getRandomPosition();
+
+      const newMoto = {
+        modelo: formData.modelo,
+        placa: formData.placa.toUpperCase(),
+        cod_tag: formData.codigoTag,
+        status: formData.status,
+        posicaoX: String(position.x),
+        posicaoY: String(position.y)
+      };
+
+      const addedMoto = await motoService.addMoto(newMoto);
+
+      if (addedMoto) {
+        alert('Moto cadastrada com sucesso!');
+        navigation.navigate('Home');
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao cadastrar moto';
+      alert(errorMessage);
+    }
+  };
   const handleLogOut = () => {
     signOut();
     navigation.navigate('Login')
