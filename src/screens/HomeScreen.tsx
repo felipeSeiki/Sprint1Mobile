@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Text, Modal, PanResponder, Animated, GestureResponderEvent, Platform, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, Modal, PanResponder, Animated, GestureResponderEvent, Platform, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import styled from 'styled-components/native';
 import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
 import theme from '../styles/theme';
-import Header from '../components/Header';
+import { HeaderContainer } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 
 interface StatusProps {
@@ -142,8 +142,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-       <Header>
-      </Header>
+      <HeaderContainer>
+        <Image 
+          source={require('../../assets/MottuLogo.png')}
+          style={styles.logo}
+        />        
+        <TouchableOpacity
+          style={styles.logOutButton}
+          onPress={handleLogOut}
+        >
+          <Text style={styles.logOutText}>Sair</Text>
+        </TouchableOpacity>
+      </HeaderContainer>
 
       <CardContainer>
         <AnimatedCardContainer
@@ -221,10 +231,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </Modal>
 
       <BottomContainer>
-        <FilterDropdown>
-          <Text>Filtro:</Text>
-          <Picker value={selectedFilter} />
-        </FilterDropdown>
+        <AddButton onPress={() => navigation.navigate('Dashboard')}>
+          <AddButtonText>DashBoard</AddButtonText>
+        </AddButton>
         <AddButton onPress={() => navigation.navigate('RegisterMoto')}>
           <AddButtonText>+ ADD MOTO</AddButtonText>
         </AddButton>
@@ -331,10 +340,7 @@ const FilterDropdown = styled.View`
   border: 1px solid #00CF3A;
 `;
 
-const Picker = styled.View`
-  flex: 1;
-  margin-left: 10px;
-`;
+
 
 const AddButton = styled.TouchableOpacity`
   background-color: #00CF3A;
@@ -422,9 +428,15 @@ const StatusText = styled.Text<StatusProps>`
 
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+    marginLeft: -25, // Para alinhar melhor o logo
+  },
   logOutButton: {
-    height: 30,
-    width: 50,
+    height: 35,
+    paddingHorizontal: 15,
     backgroundColor: '#00CF3A',
     borderRadius: 8,
     justifyContent: 'center',
@@ -440,6 +452,11 @@ const styles = StyleSheet.create({
         elevation: 4,
       },
     }),
+  },
+  logOutText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 14,
   }
 });
 export default HomeScreen;

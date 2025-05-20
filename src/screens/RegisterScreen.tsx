@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Animated, PanResponder, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Platform, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -10,8 +10,6 @@ import styled from 'styled-components/native';
 type RegisterScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 export const RegisterScreen: React.FC = () => {
-  const { signOut } = useAuth();
-
   const [formData, setFormData] = useState({
     usuario: '',
     senha: '',
@@ -21,9 +19,6 @@ export const RegisterScreen: React.FC = () => {
     cidade: '',
     estado: ''
   });
-
-  const pan = useRef(new Animated.ValueXY()).current;
-  const scale = useRef(new Animated.Value(1)).current;
 
   const navigation = useNavigation<RegisterScreenNavigationProp>();
 
@@ -36,29 +31,6 @@ export const RegisterScreen: React.FC = () => {
 
   const { register } = useAuth();
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-
-      onPanResponderGrant: () => {
-        pan.extractOffset();
-      },
-
-      onPanResponderMove: Animated.event(
-        [
-          null,
-          { dx: pan.x, dy: pan.y }
-        ],
-        { useNativeDriver: false }
-      ),
-
-      onPanResponderRelease: () => {
-        // Simply flatten the offset to keep the view where it was released
-        pan.flattenOffset();
-      }
-    })
-  ).current;
   
   const handleSubmit = async () => {
     try {
@@ -77,32 +49,23 @@ export const RegisterScreen: React.FC = () => {
       const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       alert('Erro ao realizar cadastro: ' + errorMessage);
     }
-  };
-
-  const handleLogOut = () => {
-    signOut();
-    navigation.navigate('Login')
-  };
-
-  return (
+  };  return (
     <SafeAreaView style={styles.container}>
       <HeaderContainer>
-      <TouchableOpacity
-          style={styles.logOutButton}
-          onPress={handleLogOut}
-        >
-          <Text>Sair</Text>
-        </TouchableOpacity>
-      </HeaderContainer>
-      <CardContainer>
-      <AnimatedCardContainer {...panResponder.panHandlers}
-          style={{
-            transform: [
-              { translateY: pan.y },
-              { scale: scale }
-            ]
-          }}>
-        <View style={styles.content}>
+        <Image 
+          source={require('../../assets/MottuLogo.png')}
+          style={styles.logo}
+        /> 
+      </HeaderContainer>      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+        scrollEventThrottle={16}
+        decelerationRate="normal"
+        keyboardShouldPersistTaps="handled"
+      >
+        <FormCard>
           <Text style={styles.title}>Cadastro</Text>
           
           <View style={styles.formGroup}>
@@ -196,49 +159,41 @@ export const RegisterScreen: React.FC = () => {
           >
             <Text style={styles.loginText}>Já possui conta? Faça login</Text>
           </TouchableOpacity>
-        </View>
-      </AnimatedCardContainer>        
-      </CardContainer>
+        </FormCard>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
-const AnimatedCardContainer = styled(Animated.View)`
+const FormCard = styled.View`
   width: 95%;
-  max-width: 500px;
   background-color: #2A2A2A;
   border-radius: 20px;
   border: 2px solid #00CF3A;
-  
-  @media (min-width: 600px) {
-    max-width: 700px;
-  }
-`;
-
-const CardContainer = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
+  margin: 10px auto;
   padding: 20px;
-  height: 60px;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  overflow: hidden;
+  max-width: 500px;
 `;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  content: {
+  },  scrollView: {
     flex: 1,
-    padding: 20,
-    paddingTop: 40,
+    width: '100%',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    minHeight: '100%',
+  },
+  logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+    marginLeft: -25,
   },
   title: {
     fontSize: 24,

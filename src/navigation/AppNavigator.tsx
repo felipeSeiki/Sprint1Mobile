@@ -9,7 +9,7 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
 import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
-import AdminDashboardScreen from '../screens/DashboardScreen';
+import DashboardScreen from '../screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,16 +46,9 @@ export const AppNavigator: React.FC = () => {
               component={RegisterMotosScreen}
               options={{ title: 'Registrar Moto' }}
             />
-            {user.role === 'admin' && (
-              <Stack.Screen 
-                name="AdminDashboard" 
-                component={AdminDashboardScreen}
-                options={{ title: 'Painel Administrativo' }}
-              />
-            )}
             <Stack.Screen 
               name="Dashboard" 
-              component={HomeScreen}
+              component={DashboardScreen}
               options={{ title: 'Dashboard' }}
             />
           </>

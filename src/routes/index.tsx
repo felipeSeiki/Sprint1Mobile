@@ -5,6 +5,7 @@ import HomeScreen from '../screens/HomeScreen';
 import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types/navigation';
+import DashboardScreen from '../screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -38,7 +39,7 @@ export default function AppRoutes() {
           />
           <Stack.Screen 
             name="Dashboard" 
-            component={HomeScreen}
+            component={DashboardScreen}
             options={{ title: 'Dashboard' }}
           />
         </>

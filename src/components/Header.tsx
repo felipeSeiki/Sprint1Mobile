@@ -6,8 +6,12 @@ import theme from '../styles/theme';
 
 export const HeaderContainer = styled.View`
   background-color: ${theme.colors.background};
-  padding: 1.6rem;
+  padding: 16px;
   border-bottom-width: 1px;
+  border-bottom-color: #00CF3A;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Header: React.FC = () => {

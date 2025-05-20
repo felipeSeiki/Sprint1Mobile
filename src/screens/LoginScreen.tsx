@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -26,7 +26,12 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderContainer/>
+      <HeaderContainer>
+        <Image 
+          source={require('../../assets/MottuLogo.png')}
+          style={styles.logo}
+        />    
+      </HeaderContainer>
 
       <View style={styles.content}>
         <View style={styles.loginContainer}>
@@ -73,6 +78,12 @@ export const LoginScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    logo: {
+    width: 120,
+    height: 40,
+    resizeMode: 'contain',
+    marginLeft: -25, // Para alinhar melhor o logo
+  },
   container: {
     flex: 1,
     backgroundColor: '#1A1A1A',
