@@ -1,40 +1,45 @@
-Sistema de Agendamento de Consultas Médicas
+# MottuApp - Sistema de Agendamento de Consultas Médicas
+Desenvolvido por:
 
 Felipe Seiki Hashiguti - RM: 98985
 
-📱 Sobre o Projeto
-Clínica App é um aplicativo mobile desenvolvido em React Native (Expo) + TypeScript, destinado a clínicas médicas. Oferece funcionalidades personalizadas para três tipos de usuários: administrador, médico e paciente, garantindo uma experiência adaptada para cada perfil.
+Lucas Corradini Silveira - RM: 555118
 
-<h2> Principais Funcionalidades </h2>
-<h3> Autenticação e Controle de Acesso: </h3>
-Login simulado com armazenamento local (AsyncStorage).
+Matheus Gregorio Mota - RM: 557254
 
-Gerenciamento de sessão via AuthContext (contexto de autenticação).
+## 📱 Sobre o Projeto
+O MottuApp é um aplicativo mobile desenvolvido em React Native (Expo) + TypeScript, focado na gestão logística de motos. O sistema permite o cadastro de motos e perfis, facilitando o rastreamento preciso da localização de cada veículo dentro de um pátio ou espaço definido.
 
-Tipagem de usuários (UserType) para diferenciar permissões:
+Além disso, o aplicativo oferece funcionalidades para registrar e atualizar o status de cada moto, garantindo um controle eficiente sobre o estado e a disponibilidade dos veículos.
 
-Admin: Acesso total.
+## 🛠️ Funcionalidades
+✔ Cadastro de Motos
 
-Médico: Visualização de consultas vinculadas.
+Armazena informações como modelo, placa e outras especificações.
 
-Paciente: Acesso apenas aos próprios agendamentos.
+Permite atualizar o status de cada moto (disponível, em manutenção, alugada, etc.).
 
-<h2> Perfil Personalizado </h2> 
-Exibição de informações conforme o tipo de usuário:
+✔ Perfis de Usuários
 
-Admin: Nome e cargo.
+Cadastro de usuários de acordo com cada unidade.
 
-Médico: Nome, especialidade e CRM.
+✔ Localização em Tempo Real
 
-Paciente: Nome, idade e histórico médico resumido.
+Rastreamento preciso da localização das motos dentro de um pátio ou área delimitada.
 
-<h2> Gestão de Agendamentos </h2> 
-Visualização dinâmica de consultas:
+✔ Gestão de Status
 
-Admin: Todos os agendamentos.
+Atualização em tempo real do estado de cada moto (operacional, em reparo, etc.).
 
-Médico: Apenas suas consultas.
+## 🚀 Tecnologias Utilizadas
+React Native (Expo) - Para desenvolvimento cross-platform.
 
-Paciente: Somente seus agendamentos.
+TypeScript - Para tipagem estática e melhor manutenibilidade do código.
 
-Componente reutilizável AgendamentoCard para exibição padronizada.
+📥 Instalação e Execução
+Clone o repositório
+
+git clone https://github.com/seu-usuario/mottuapp.git
+cd mottuapp
+npm install ou npm i -f
+expo start ou npm start
