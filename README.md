@@ -1,4 +1,4 @@
-# MottuApp - Sistema de Agendamento de Consultas Médicas
+# DashMottu - Sistema de Agendamento de Consultas Médicas
 Desenvolvido por:
 
 Felipe Seiki Hashiguti - RM: 98985
@@ -8,7 +8,7 @@ Lucas Corradini Silveira - RM: 555118
 Matheus Gregorio Mota - RM: 557254
 
 ## 📱 Sobre o Projeto
-O MottuApp é um aplicativo mobile desenvolvido em React Native (Expo) + TypeScript, focado na gestão logística de motos. O sistema permite o cadastro de motos e perfis, facilitando o rastreamento preciso da localização de cada veículo dentro de um pátio ou espaço definido.
+O DashMottu é um aplicativo mobile desenvolvido em React Native (Expo) + TypeScript, focado na gestão logística de motos. O sistema permite o cadastro de motos e perfis, facilitando o rastreamento preciso da localização de cada veículo dentro de um pátio ou espaço definido.
 
 Além disso, o aplicativo oferece funcionalidades para registrar e atualizar o status de cada moto, garantindo um controle eficiente sobre o estado e a disponibilidade dos veículos.
 

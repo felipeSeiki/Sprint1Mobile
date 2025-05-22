@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Modal, Platform, Image } from 'react-native';
 import styled from 'styled-components/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types/navigation';
 import { Moto } from '../types/motos';
 import { useAuth } from '../contexts/AuthContext';
 import { HeaderContainer } from '../components/Header';
+import { motoService } from '../services/auth';
 
 type DashboardScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
@@ -16,37 +17,26 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('Todas');
   const [showModal, setShowModal] = useState(false);
   const [selectedMoto, setSelectedMoto] = useState<Moto | null>(null);
+  const [motos, setMotos] = useState<Moto[]>([]);
 
-  // Dados mockados das motos
-  const motos: Moto[] = [
-    {
-      id: '1',
-      modelo: 'Honda CB 500',
-      placa: 'ABC-1234',
-      cod_tag: 'TAG001',
-      status: 'Disponível',
-      posicaoX: '0',
-      posicaoY: '0',
-    },
-    {
-      id: '2',
-      modelo: 'Yamaha MT-07',
-      placa: 'DEF-5678',
-      cod_tag: 'TAG002',
-      status: 'Manutenção',
-      posicaoX: '2',
-      posicaoY: '1',
-    },
-    {
-      id: '3',
-      modelo: 'Kawasaki Ninja 400',
-      placa: 'GHI-9012',
-      cod_tag: 'TAG003',
-      status: 'Reservada',
-      posicaoX: '8',
-      posicaoY: '1',
-    },
-  ];
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    const loadMotos = async () => {
+      const allMotos = await motoService.getAllMotos();
+      setMotos(allMotos);
+    };
+
+    unsubscribe = motoService.subscribe((newMotos) => {
+      setMotos(newMotos);
+    });
+
+    loadMotos();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   const handleMotoPress = (moto: Moto) => {
     setSelectedMoto(moto);

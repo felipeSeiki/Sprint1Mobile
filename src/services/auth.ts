@@ -4,9 +4,10 @@ import { Moto } from '../types/motos';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
-  USER: '@MedicalApp:user',
-  TOKEN: '@MedicalApp:token',
-  REGISTERED_USERS: '@MedicalApp:registeredUsers',
+  USER: '@MottuApp:user',
+  TOKEN: '@MottuApp:token',
+  REGISTERED_USERS: '@MottuApp:registeredUsers',
+  MOTOS: '@MottuApp:motos',
 };
 
 // Motos mockadas para teste
@@ -165,33 +166,70 @@ export const authService = {
 };
 
 export const motoService = {
-  // Buscar todas as motos
-  getAllMotos: () => mockMotos,
+  subscribers: new Set<(motos: Moto[]) => void>(),
 
-  // Buscar moto por ID
-  getMotoById: (id: string) => mockMotos.find(moto => moto.id === id),
-
-  // Buscar motos por status
-  getMotosByStatus: (status: string) => 
-    mockMotos.filter(moto => moto.status === status),
-
-  // Adicionar nova moto (simulação)
-  addMoto: (newMoto: Omit<Moto, 'id'>) => {
-    const moto = {
-      ...newMoto,
-      id: String(mockMotos.length + 1)
-    };
-    mockMotos.push(moto);
-    return moto;
+  subscribe(callback: (motos: Moto[]) => void) {
+    this.subscribers.add(callback);
+    return () => this.subscribers.delete(callback);
   },
 
-  // Atualizar status da moto
-  updateMotoStatus: (id: string, status: string) => {
-    const moto = mockMotos.find(m => m.id === id);
-    if (moto) {
-      moto.status = status;
-      return moto;
+  async getAllMotos(): Promise<Moto[]> {
+    try {
+      const motosJson = await AsyncStorage.getItem(STORAGE_KEYS.MOTOS);
+      if (motosJson) {
+        return JSON.parse(motosJson);
+      }
+      // If no motos stored, use mock data
+      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(mockMotos));
+      return mockMotos;
+    } catch (error) {
+      console.error('Erro ao carregar motos:', error);
+      return mockMotos;
     }
-    return null;
+  },
+
+  async addMoto(newMoto: Omit<Moto, 'id'>): Promise<Moto> {
+    try {
+      const motos = await this.getAllMotos();
+      const moto = {
+        ...newMoto,
+        id: String(motos.length + 1)
+      };
+      
+      motos.push(moto);
+      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(motos));
+      
+      return moto;
+    } catch (error) {
+      console.error('Erro ao adicionar moto:', error);
+      throw new Error('Falha ao adicionar moto');
+    }
+  },
+
+  async updateMotoStatus(id: string, status: string): Promise<Moto | null> {
+    try {
+      const motos = await this.getAllMotos();
+      const moto = motos.find(m => m.id === id);
+      
+      if (moto) {
+        moto.status = status;
+        await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(motos));
+        return moto;
+      }
+      return null;
+    } catch (error) {
+      console.error('Erro ao atualizar status da moto:', error);
+      throw new Error('Falha ao atualizar status da moto');
+    }
+  },
+
+  async getMotoById(id: string): Promise<Moto | undefined> {
+    const motos = await this.getAllMotos();
+    return motos.find(moto => moto.id === id);
+  },
+
+  async getMotosByStatus(status: string): Promise<Moto[]> {
+    const motos = await this.getAllMotos();
+    return motos.filter(moto => moto.status === status);
   }
 };

@@ -7,6 +7,7 @@ import { Moto } from '../types/motos';
 import theme from '../styles/theme';
 import { HeaderContainer } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
+import { motoService } from '../services/auth';
 
 interface StatusProps {
   status: string;
@@ -69,39 +70,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     })
   ).current;
 
-  // Mock de motos para teste
-  const mockMotos: Moto[] = [
-    {
-      id: '1',
-      modelo: 'Honda CB 500',
-      placa: 'ABC-1234',
-      cod_tag: 'TAG001',
-      status: 'Disponível',
-      posicaoX: '0',
-      posicaoY: '0',
-    },
-    {
-      id: '2',
-      modelo: 'Yamaha MT-07',
-      placa: 'DEF-5678',
-      cod_tag: 'TAG002',
-      status: 'Manutenção',
-      posicaoX: '2',
-      posicaoY: '1',
-    },
-    {
-      id: '3',
-      modelo: 'Kawasaki Ninja 400',
-      placa: 'GHI-9012',
-      cod_tag: 'TAG003',
-      status: 'Estacionada',
-      posicaoX: '8',
-      posicaoY: '1',
-    },
-  ];
-
   useEffect(() => {
-    setMotos(mockMotos);
+    let unsubscribe: (() => void) | undefined;
+
+    const loadMotos = async () => {
+      const allMotos = await motoService.getAllMotos();
+      setMotos(allMotos);
+    };
+
+    unsubscribe = motoService.subscribe((newMotos) => {
+      setMotos(newMotos);
+    });
+
+    loadMotos();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleMotoPress = (moto: Moto) => {

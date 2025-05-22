@@ -11,6 +11,7 @@ import {
   Platform,
   Image
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,6 +24,8 @@ type RegisterMotosScreenNavigationProp = StackNavigationProp<RootStackParamList,
 const { width } = Dimensions.get('window');
 const isSmallDevice = width < 375;
 
+const validStatuses = ['Disponível', 'Manutenção', 'Reservada'];
+
 export const RegisterMotosScreen: React.FC = () => {
   const { signOut } = useAuth();
 
@@ -31,9 +34,8 @@ export const RegisterMotosScreen: React.FC = () => {
     middle: { x: [0, 1, 2, 3, 4, 8, 9, 10, 11, 12], y: 1 },
     bottom: { x: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], y: 2 }
   };
-
-  const getRandomPosition = () => {
-    const existingMotos = motoService.getAllMotos();
+  const getRandomPosition = async () => {
+    const existingMotos = await motoService.getAllMotos();
 
     const allPositions: Array<{ x: number, y: number }> = [];
 
@@ -76,14 +78,37 @@ export const RegisterMotosScreen: React.FC = () => {
     }));
   };
 
+  const validateForm = () => {
+    const errors = [];
+
+    if (!formData.modelo) errors.push('Modelo é obrigatório');
+    if (!formData.placa) errors.push('Placa é obrigatória');
+    if (!formData.codigoTag) errors.push('Código Tag é obrigatório');
+    if (!formData.status) errors.push('Status é obrigatório');
+
+    // Validar formato da placa (ABC1234)
+    const placaRegex = /^[A-Z]{3}[0-9]{4}$/;
+    if (!placaRegex.test(formData.placa)) {
+      errors.push('Formato de placa inválido. Use o formato ABC1234');
+    }
+
+    // Validar status
+    if (!validStatuses.includes(formData.status)) {
+      errors.push(`Status inválido. Use um dos seguintes: ${validStatuses.join(', ')}`);
+    }
+
+    return errors;
+  };
+
   const handleSubmit = async () => {
     try {
-      if (!formData.modelo || !formData.placa || !formData.codigoTag || !formData.status) {
-        alert('Por favor, preencha todos os campos obrigatórios');
+      const errors = validateForm();
+      if (errors.length > 0) {
+        alert(errors.join('\n'));
         return;
       }
 
-      const position = getRandomPosition();
+      const position = await getRandomPosition();
 
       const newMoto = {
         modelo: formData.modelo,
@@ -105,6 +130,7 @@ export const RegisterMotosScreen: React.FC = () => {
       alert(errorMessage);
     }
   };
+
   const handleLogOut = () => {
     signOut();
     navigation.navigate('Login')
@@ -173,13 +199,20 @@ export const RegisterMotosScreen: React.FC = () => {
 
           <View style={styles.formGroup}>
             <Text style={styles.label}>Status:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Status da moto"
-              placeholderTextColor="#999"
-              value={formData.status}
-              onChangeText={(text) => handleChange('status', text)}
-            />
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={formData.status}
+                onValueChange={(value) => handleChange('status', value)}
+                style={styles.picker}
+                dropdownIconColor="#FFFFFF"
+                mode="dropdown"
+              >
+                <Picker.Item label="Selecione um status" value="" enabled={false} color="#999" />
+                {validStatuses.map((status) => (
+                  <Picker.Item key={status} label={status} value={status} color="#FFFFFF" />
+                ))}
+              </Picker>
+            </View>
           </View>
 
           <TouchableOpacity
@@ -201,6 +234,18 @@ const styles = StyleSheet.create({
     height: 40,
     resizeMode: 'contain',
     marginLeft: -25, // Para alinhar melhor o logo
+  }, pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#00CF3A',
+    borderRadius: 8,
+    backgroundColor: '#2A2A2A',
+    overflow: 'hidden',
+    marginTop: 5,
+  },
+  picker: {
+    color: '#FFFFFF',
+    height: isSmallDevice ? 45 : 50,
+    backgroundColor: '#333333',
   },
   logOutText: {
     color: '#FFFFFF',
