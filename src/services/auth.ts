@@ -18,8 +18,8 @@ const mockMotos = [
     placa: 'ABC-1234',
     cod_tag: 'TAG001',
     status: 'Disponível',
-    posicaoX: '10',
-    posicaoY: '20',
+    posicaoX: '2',
+    posicaoY: '0',
   },
   {
     id: '2',
@@ -27,17 +27,17 @@ const mockMotos = [
     placa: 'DEF-5678',
     cod_tag: 'TAG002',
     status: 'Manutenção',
-    posicaoX: '2',
-    posicaoY: '15',
+    posicaoX: '3',
+    posicaoY: '1',
   },
   {
     id: '3',
     modelo: 'Kawasaki Ninja 400',
     placa: 'GHI-9012',
     cod_tag: 'TAG003',
-    status: 'Estacionada',
+    status: 'Reservada',
     posicaoX: '4',
-    posicaoY: '20',
+    posicaoY: '2',
   },
 ];
 
@@ -231,5 +231,17 @@ export const motoService = {
   async getMotosByStatus(status: string): Promise<Moto[]> {
     const motos = await this.getAllMotos();
     return motos.filter(moto => moto.status === status);
-  }
+  },
+
+  async resetStorage(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(STORAGE_KEYS.MOTOS);
+      // Reinicializa com os dados mockados
+      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(mockMotos));
+      // Notifica todos os subscribers sobre a mudança
+      this.subscribers.forEach(callback => callback(mockMotos));
+    } catch (error) {
+      console.error('Erro ao resetar storage:', error);
+    }
+  },
 };
