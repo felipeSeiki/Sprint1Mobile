@@ -37,9 +37,9 @@ React Native (Expo) - Para desenvolvimento cross-platform.
 TypeScript - Para tipagem estática e melhor manutenibilidade do código.
 
 📥 Instalação e Execução
-Clone o repositório
+<p> Clone o repositório </p>
 
 git clone https://github.com/seu-usuario/mottuapp.git
-cd mottuapp
-npm install ou npm i -f
-expo start ou npm start
+<p> cd mottuapp </p>
+<p> npm install ou npm i -f </p>
+<p> expo start ou npm start </p>
