@@ -6,7 +6,7 @@ import { RootStackParamList } from '../types/navigation';
 
 // Screens
 import { LoginScreen } from '../screens/LoginScreen';
-import { RegisterScreen } from '../screens/RegisterScreen';
+import { RegisterScreen } from '../screens/Register';
 import HomeScreen from '../screens/HomeScreen';
 import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
 import DashboardScreen from '../screens/DashboardScreen';
@@ -36,18 +36,18 @@ export const AppNavigator: React.FC = () => {
         ) : (
           // Rotas protegidas
           <>
-            <Stack.Screen 
-              name="Home" 
+            <Stack.Screen
+              name="Home"
               component={HomeScreen}
               options={{ title: 'Início' }}
             />
-            <Stack.Screen 
-              name="RegisterMoto" 
+            <Stack.Screen
+              name="RegisterMoto"
               component={RegisterMotosScreen}
               options={{ title: 'Registrar Moto' }}
             />
-            <Stack.Screen 
-              name="Dashboard" 
+            <Stack.Screen
+              name="Dashboard"
               component={DashboardScreen}
               options={{ title: 'Dashboard' }}
             />
