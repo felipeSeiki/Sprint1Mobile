@@ -1,14 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Text, TouchableOpacity, ScrollView, Modal, Image } from 'react-native';
+import { Text, ScrollView, Modal, Image, TouchableOpacity } from 'react-native';
 import { useDashBoard } from './hook/useDashBoard';
 import { DashboardScreenProps } from './type/type';
-import { Container, styles } from './styles';
+import { ActionBar, AddButton, AddButtonText, CloseButton, CloseText, Container, Content, DetailLabel, DetailRow, DetailValue, FilterButton, FilterContainer, FilterLabel, FilterText, HeaderText, ListHeader, ModalBody, ModalContent, ModalHeader, ModalOverlay, ModalTitle, MotoItem, MotoList, MotoText, StatusBadge, StatusText, StatusValue, styles, SummaryCard, SummaryContainer, SummaryLabel, SummaryNumber } from './styles';
 import { HeaderContainer } from '../../components/Header';
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
-    const {
-
-    } = useDashBoard();
+  const {
+    selectedFilter,
+    showModal,
+    setShowModal,
+    selectedMoto,
+    motos,
+    handleMotoPress,
+    handleLogOut,
+  } = useDashBoard();
 
   return (
     <Container>
@@ -24,7 +30,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.logOutButton}
-          onPress={handleLogOut}
+          onPress={() => handleLogOut(navigation)}
         >
           <Text style={styles.logOutText}>Sair</Text>
         </TouchableOpacity>
