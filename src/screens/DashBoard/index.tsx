@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Text, ScrollView, Modal, Image, TouchableOpacity } from 'react-native';
+import React from 'react';
+import { Text, Image, TouchableOpacity } from 'react-native';
 import { useDashBoard } from './hook/useDashBoard';
 import { DashboardScreenProps } from './type/type';
-import { ActionBar, AddButton, AddButtonText, CloseButton, CloseText, Container, Content, DetailLabel, DetailRow, DetailValue, FilterButton, FilterContainer, FilterLabel, FilterText, HeaderText, ListHeader, ModalBody, ModalContent, ModalHeader, ModalOverlay, ModalTitle, MotoItem, MotoList, MotoText, StatusBadge, StatusText, StatusValue, styles, SummaryCard, SummaryContainer, SummaryLabel, SummaryNumber } from './styles';
 import { HeaderContainer } from '../../components/Header';
 import { ListMoto } from './components/ListMoto';
 import { SummaryMoto } from './components/SummaryMoto';
 import { ModalMoto } from './components/ModalMoto';
+import { ActionBar, AddButton, AddButtonText, Container, Content, FilterButton, FilterContainer, FilterLabel, FilterText, styles } from './styles';
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const {
@@ -70,7 +70,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
         setShowModal={setShowModal}
         selectedMoto={selectedMoto}
       />
-      
+
     </Container>
   );
 };
