@@ -27,7 +27,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
           style={{ backgroundColor: 'transparent' }}
         >
           <Image
-            source={require('../../assets/MottuLogo.png')}
+            source={require('../../../assets/MottuLogo.png')}
             style={styles.logo}
           />
         </TouchableOpacity>

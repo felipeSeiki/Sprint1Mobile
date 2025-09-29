@@ -5,10 +5,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types/navigation';
 
 // Screens
-import { LoginScreen } from '../screens/LoginScreen';
+import { LoginScreen } from '../screens/Login';
 import { RegisterScreen } from '../screens/Register';
 import HomeScreen from '../screens/Home';
-import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
+import { RegisterMotosScreen } from '../screens/RegisterMoto';
 import DashboardScreen from '../screens/DashBoard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

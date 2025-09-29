@@ -17,7 +17,7 @@ export const LoginScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <HeaderContainer>
         <Image 
-          source={require('../../assets/MottuLogo.png')}
+          source={require('../../../assets/MottuLogo.png')}
           style={styles.logo}
         />    
       </HeaderContainer>
