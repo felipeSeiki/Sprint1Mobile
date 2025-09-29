@@ -9,7 +9,7 @@ import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/Register';
 import HomeScreen from '../screens/Home';
 import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
-import DashboardScreen from '../screens/DashboardScreen';
+import DashboardScreen from '../screens/DashBoard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
