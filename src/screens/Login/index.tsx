@@ -7,7 +7,7 @@ import { styles } from './styles';
 
 export const LoginScreen: React.FC = () => {
   const {
-    email, setEmail,
+    user, setUser,
     password, setPassword,
     navigation,
     handleLogin
@@ -27,8 +27,8 @@ export const LoginScreen: React.FC = () => {
           <Text style={styles.title}>LOGIN</Text>
           
           <LoginInputs
-            email={email}
-            setEmail={setEmail}
+            user={user}
+            setUser={setUser}
             password={password}
             setPassword={setPassword}
           />

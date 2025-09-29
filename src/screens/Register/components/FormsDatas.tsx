@@ -28,7 +28,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     placeholder="Digite seu usuário"
                     placeholderTextColor="#999"
                     value={formData.user}
-                    onChangeText={(text) => handleChange('usuario', text)}
+                    onChangeText={(text) => handleChange('user', text)}
                 />
             </View>
 
@@ -40,7 +40,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     placeholderTextColor="#999"
                     secureTextEntry
                     value={formData.password}
-                    onChangeText={(text) => handleChange('senha', text)}
+                    onChangeText={(text) => handleChange('password', text)}
                 />
             </View>
 

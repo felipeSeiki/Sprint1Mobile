@@ -2,13 +2,13 @@ import { View, Text, TextInput } from "react-native";
 import { styles } from "../styles";
 
 interface LoginInputsProps {
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  user: string;
+  setUser: React.Dispatch<React.SetStateAction<string>>;
   password: string;
   setPassword: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const LoginInputs: React.FC<LoginInputsProps> = ({ email, setEmail, password, setPassword}) => {
+export const LoginInputs: React.FC<LoginInputsProps> = ({ user, setUser, password, setPassword}) => {
   return (
     <>
       <View style={styles.inputContainer}>
@@ -17,8 +17,8 @@ export const LoginInputs: React.FC<LoginInputsProps> = ({ email, setEmail, passw
           style={styles.input}
           placeholder="Digite seu usuário"
           placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
+          value={user}
+          onChangeText={setUser}
           autoCapitalize="none"
         />
       </View>

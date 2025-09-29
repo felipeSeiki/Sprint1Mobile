@@ -77,17 +77,16 @@ export const authService = {
   async register(data: RegisterData): Promise<AuthResponse> {
     // Cria um novo usuário administrador
     const newUser: Admin = {
-      id: `user-${registeredUsers.length + 1}`,
       user: data.user,
       role: 'ADMIN' as const,
       password:data.password,
-      endereco: {
-        cep: data.cep || '',
-        logradouro: data.logradouro || '',
-        numero: data.numero || '',
-        cidade: data.cidade || '',
-        estado: data.estado || ''
-      }
+      // endereco: {
+      //   cep: data.cep || '',
+      //   logradouro: data.logradouro || '',
+      //   numero: data.numero || '',
+      //   cidade: data.cidade || '',
+      //   estado: data.estado || ''
+      // }
     };
 
     registeredUsers.push(newUser);

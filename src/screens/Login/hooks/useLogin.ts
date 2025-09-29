@@ -7,12 +7,12 @@ export const useLogin = () => {
   const { signIn } = useAuth();
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
-  const [email, setEmail] = useState("");
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
-      await signIn({ email, password });
+      await signIn({ user, password });
       navigation.navigate("Home");
     } catch (error) {
       alert("Usuário ou senha inválidos");
@@ -21,7 +21,7 @@ export const useLogin = () => {
 
   return {
     signIn,
-    email, setEmail,
+    user, setUser,
     password, setPassword,
     navigation,
     handleLogin

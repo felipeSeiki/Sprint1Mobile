@@ -11,7 +11,7 @@ export type UserRole = "ADMIN" | "OPERATOR";
  * Interface base do usuário
  */
 export interface BaseUser {
-  id: string;
+  id?: string;
   user: string;
   role: UserRole;
   password: string;
@@ -49,7 +49,7 @@ export type User = Admin | Operator;
  * Dados necessários para login
  */
 export interface LoginCredentials {
-  email: string;
+  user: string;
   password: string;
 }
 
