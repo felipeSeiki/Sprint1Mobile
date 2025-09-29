@@ -5,7 +5,7 @@
 /**
  * Perfis de usuário disponíveis no sistema
  */
-export type UserRole = 'admin' | 'doctor' | 'patient';
+export type UserRole = "admin" | "operator";
 
 /**
  * Interface base do usuário
@@ -19,18 +19,10 @@ export interface BaseUser {
 }
 
 /**
- * Interface do médico
- */
-export interface Doctor extends BaseUser {
-  role: 'doctor';
-  specialty: string;
-}
-
-/**
  * Interface do paciente
  */
-export interface Patient extends BaseUser {
-  role: 'patient';
+export interface Operator extends BaseUser {
+  role: "operator";
 }
 
 /**
@@ -45,14 +37,14 @@ export interface Address {
 }
 
 export interface Admin extends BaseUser {
-  role: 'admin';
+  role: "admin";
   endereco?: Address;
 }
 
 /**
  * Interface do usuário autenticado
  */
-export type User = Admin | Doctor | Patient;
+export type User = Admin | Operator;
 
 /**
  * Dados necessários para login
@@ -93,4 +85,4 @@ export interface AuthContextData {
   signIn: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   signOut: () => Promise<void>;
-} 
+}
