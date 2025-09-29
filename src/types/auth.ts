@@ -5,24 +5,23 @@
 /**
  * Perfis de usuário disponíveis no sistema
  */
-export type UserRole = "admin" | "operator";
+export type UserRole = "ADMIN" | "OPERATOR";
 
 /**
  * Interface base do usuário
  */
 export interface BaseUser {
   id: string;
-  name: string;
-  email: string;
+  user: string;
   role: UserRole;
-  image: string;
+  password: string;
 }
 
 /**
  * Interface do paciente
  */
 export interface Operator extends BaseUser {
-  role: "operator";
+  role: "OPERATOR";
 }
 
 /**
@@ -37,7 +36,7 @@ export interface Address {
 }
 
 export interface Admin extends BaseUser {
-  role: "admin";
+  role: "ADMIN";
   endereco?: Address;
 }
 
@@ -58,8 +57,7 @@ export interface LoginCredentials {
  * Dados necessários para registro
  */
 export interface RegisterData {
-  name: string;
-  email: string;
+  user: string;
   password: string;
   cep?: string;
   logradouro?: string;

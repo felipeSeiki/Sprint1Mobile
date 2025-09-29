@@ -3,8 +3,8 @@ import { FormCard, styles } from "../styles"
 
 interface FormsDatasProps {
     formData: {
-        usuario: string;
-        senha: string;
+        user: string;
+        password: string;
         cep: string;
         logradouro: string;
         numero: string;
@@ -27,7 +27,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     style={styles.input}
                     placeholder="Digite seu usuário"
                     placeholderTextColor="#999"
-                    value={formData.usuario}
+                    value={formData.user}
                     onChangeText={(text) => handleChange('usuario', text)}
                 />
             </View>
@@ -39,7 +39,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     placeholder="Digite sua senha"
                     placeholderTextColor="#999"
                     secureTextEntry
-                    value={formData.senha}
+                    value={formData.password}
                     onChangeText={(text) => handleChange('senha', text)}
                 />
             </View>

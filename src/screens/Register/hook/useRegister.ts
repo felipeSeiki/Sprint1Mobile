@@ -8,8 +8,8 @@ export const useRegister = () => {
   const { register } = useAuth();
 
   const [formData, setFormData] = useState({
-    usuario: "",
-    senha: "",
+    user: "",
+    password: "",
     cep: "",
     logradouro: "",
     numero: "",
@@ -27,8 +27,8 @@ export const useRegister = () => {
   const handleSubmit = async () => {
     try {
       if (
-        !formData.usuario ||
-        !formData.senha ||
+        !formData.user ||
+        !formData.password ||
         !formData.cep ||
         !formData.logradouro ||
         !formData.numero ||
@@ -40,9 +40,8 @@ export const useRegister = () => {
       }
 
       await register({
-        name: formData.usuario,
-        email: formData.usuario,
-        password: formData.senha,
+        user: formData.user,
+        password: formData.password,
         cep: formData.cep,
         logradouro: formData.logradouro,
         numero: formData.numero,

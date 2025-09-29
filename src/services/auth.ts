@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
 import { Moto } from '../types/motos';
+import { api } from '../config/api';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -62,22 +63,11 @@ let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
-    // Verifica se é o usuário padrão
-    if (credentials.email === mockUser.email && credentials.password === '123456') {
+    if (credentials) {
+      const mockUser: Admin = await api.post('/auth/login', credentials).then(res => res.data);
       return {
         user: mockUser,
         token: 'user-token',
-      };
-    }
-
-    // Verifica se é um usuário registrado
-    const registeredUser = registeredUsers.find(
-      (u) => u.email === credentials.email && credentials.password === '123456'
-    );
-    if (registeredUser) {
-      return {
-        user: registeredUser,
-        token: `user-token-${registeredUser.id}`,
       };
     }
 
@@ -85,21 +75,12 @@ export const authService = {
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    // Verifica se o email já está em uso
-    if (
-      mockUser.email === data.email ||
-      registeredUsers.some((u) => u.email === data.email)
-    ) {
-      throw new Error('Email já está em uso');
-    }
-
     // Cria um novo usuário administrador
     const newUser: Admin = {
       id: `user-${registeredUsers.length + 1}`,
-      name: data.name,
-      email: data.email,
-      role: 'admin' as const,
-      image: `https://randomuser.me/api/portraits/men/${registeredUsers.length + 1}.jpg`,
+      user: data.user,
+      role: 'ADMIN' as const,
+      password:data.password,
       endereco: {
         cep: data.cep || '',
         logradouro: data.logradouro || '',
@@ -112,7 +93,7 @@ export const authService = {
     registeredUsers.push(newUser);
 
     // Salva a lista atualizada de usuários
-    await AsyncStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(registeredUsers));
+    await api.post('/auth/register', newUser);
 
     return {
       user: newUser,
@@ -137,19 +118,6 @@ export const authService = {
       console.error('Erro ao obter usuário armazenado:', error);
       return null;
     }
-  },
-
-  // Funções para o admin
-  async getAllUsers(): Promise<User[]> {
-    return [mockUser, ...registeredUsers];
-  },
-
-  async getAllDoctors(): Promise<User[]> {
-    return [mockUser];
-  },
-
-  async getPatients(): Promise<User[]> {
-    return registeredUsers;
   },
 
   // Função para carregar usuários registrados ao iniciar o app
