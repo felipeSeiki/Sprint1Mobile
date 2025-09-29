@@ -36,7 +36,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <Container>
             <HeaderContainer>
                 <Image
-                    source={require('../../assets/MottuLogo.png')}
+                    source={require('../../../assets/MottuLogo.png')}
                     style={styles.logo}
                 />
                 <TouchableOpacity
