@@ -43,3 +43,8 @@ git clone https://github.com/seu-usuario/mottuapp.git
 <p> cd mottuapp </p>
 <p> npm install ou npm i -f </p>
 <p> expo start ou npm start </p>
+
+## Link EXPO
+
+[Abra no Expo](exp://tmirjeq-anonymous-8081.exp.direct)
+
