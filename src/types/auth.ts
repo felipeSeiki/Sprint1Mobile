@@ -60,12 +60,6 @@ export interface LoginCredentials {
 export interface RegisterData {
   user: string;
   password: string;
-  cep?: string;
-  logradouro?: string;
-  bairro?: string;
-  numero?: number;
-  cidade?: string;
-  estado?: string;
 }
 
 export interface RegisterDataPatio {

@@ -21,24 +21,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
 
   return (
     <Container>
-      <HeaderContainer>
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Home')}
-          style={{ backgroundColor: 'transparent' }}
-        >
-          <Image
-            source={require('../../../assets/MottuLogo.png')}
-            style={styles.logo}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.logOutButton}
-          onPress={() => handleLogOut(navigation)}
-        >
-          <Text style={styles.logOutText}>Sair</Text>
-        </TouchableOpacity>
-      </HeaderContainer>
-
       <Content>
 
         <SummaryMoto

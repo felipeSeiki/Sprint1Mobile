@@ -79,21 +79,40 @@ let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
-    if (credentials) {
-      const response = await api.post('/auth/login', credentials);
-      const user = response.data;
+    if (!credentials.user || !credentials.password) {
+      throw new Error('Usuário e senha são obrigatórios');
+    }
+
+    try {
+      // Busca o usuário pelo username
+      const response = await api.get(`/users?user=${credentials.user}`);
+      const users = response.data;
+      
+      // Verifica se encontrou o usuário e se a senha está correta
+      const user = users.find((u: Users) => u.user === credentials.user && u.password === credentials.password);
+      
+      if (!user) {
+        throw new Error('Usuário ou senha inválidos');
+      }
+
+      // Gera um token mock (em produção isso seria feito pelo servidor)
+      const token = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
       
       // Salva o usuário no storage
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.data.token);
+      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
 
       return {
         user,
-        token: response.data.token,
+        token,
       };
+    } catch (error: any) {
+      console.error('Erro no login:', error.response || error);
+      if (error.message === 'Usuário ou senha inválidos') {
+        throw error;
+      }
+      throw new Error('Erro ao fazer login. Tente novamente.');
     }
-
-    throw new Error('Email ou senha inválidos');
   },
 
   async checkPatioExists(): Promise<boolean> {
@@ -107,17 +126,49 @@ export const authService = {
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    const response = await api.post('/auth/register', data);
-    const user = response.data;
+    try {
+      if (!data.user || !data.password) {
+        throw new Error('Usuário e senha são obrigatórios');
+      }
 
-    // Salva o usuário no storage
-    await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-    await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.data.token);
+      // Verifica se o usuário já existe
+      const existingUsers = await api.get(`/users?user=${data.user}`);
+      if (existingUsers.data.length > 0) {
+        throw new Error('Usuário já existe');
+      }
 
-    return {
-      user,
-      token: response.data.token,
-    };
+      // Cria o novo usuário
+      const newUser = {
+        user: data.user,
+        password: data.password,
+        role: 'USER' as UserRole
+      };
+
+      const response = await api.post('/users', newUser);
+      const user = response.data;
+
+      // Gera um token mock (em produção isso seria feito pelo servidor)
+      const token = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
+
+      // Salva o usuário e token no storage
+      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+
+      return {
+        user,
+        token,
+      };
+    } catch (error: any) {
+      console.error('Erro no registro:', error.response || error);
+      
+      if (error.message === 'Usuário já existe') {
+        throw error;
+      } else if (error.message === 'Network Error') {
+        throw new Error('Erro de conexão com o servidor. Tente novamente.');
+      }
+      
+      throw new Error('Erro ao registrar usuário. Tente novamente.');
+    }
   },
 
   async registerPatio(data: RegisterDataPatio): Promise<Patio> {

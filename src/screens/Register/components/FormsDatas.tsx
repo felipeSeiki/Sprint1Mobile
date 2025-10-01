@@ -5,15 +5,6 @@ interface FormsDatasProps {
     formData: {
         user: string;
         password: string;
-        endereco: {
-            logradouro: string,
-            numero: string,
-            bairro: string,
-            cidade: string,
-            estado: string,
-            cep: string,
-        },
-        imagemPlantaUrl: string
     };
     handleChange: (name: string, value: string) => void;
     handleSubmit: () => void;
@@ -33,64 +24,20 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     placeholderTextColor="#999"
                     value={formData.user}
                     onChangeText={(text) => handleChange('user', text)}
+                    autoCapitalize="none"
                 />
             </View>
 
             <View style={styles.formGroup}>
-                <Text style={styles.label}>CEP:</Text>
+                <Text style={styles.label}>Senha:</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Digite seu CEP"
+                    placeholder="Digite sua senha"
                     placeholderTextColor="#999"
-                    keyboardType="numeric"
-                    value={formData.endereco.cep}
-                    onChangeText={(text) => handleChange('cep', text)}
-                />
-            </View>
-
-            <View style={styles.formGroup}>
-                <Text style={styles.label}>Logradouro:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Rua/Avenida"
-                    placeholderTextColor="#999"
-                    value={formData.endereco.logradouro}
-                    onChangeText={(text) => handleChange('logradouro', text)}
-                />
-            </View>
-
-            <View style={styles.formGroup}>
-                <Text style={styles.label}>Número:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Número"
-                    placeholderTextColor="#999"
-                    keyboardType="numeric"
-                    value={formData.endereco.numero}
-                    onChangeText={(text) => handleChange('numero', text)}
-                />
-            </View>
-
-            <View style={styles.formGroup}>
-                <Text style={styles.label}>Cidade:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Sua cidade"
-                    placeholderTextColor="#999"
-                    value={formData.endereco.cidade}
-                    onChangeText={(text) => handleChange('cidade', text)}
-                />
-            </View>
-
-            <View style={styles.formGroup}>
-                <Text style={styles.label}>Estado:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="UF"
-                    placeholderTextColor="#999"
-                    value={formData.endereco.estado}
-                    onChangeText={(text) => handleChange('estado', text)}
-                    maxLength={2}
+                    secureTextEntry
+                    value={formData.password}
+                    onChangeText={(text) => handleChange('password', text)}
+                    autoCapitalize="none"
                 />
             </View>
 

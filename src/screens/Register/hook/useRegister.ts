@@ -10,49 +10,30 @@ export const useRegister = () => {
   const [formData, setFormData] = useState({
     user: "",
     password: "",
-    endereco: {
-      logradouro: "",
-      numero: 0,
-      bairro: "",
-      cidade: "",
-      estado: "",
-      cep: "",
-    },
-    imagemPlantaUrl: "",
   });
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: value
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      if (
-        !formData.user ||
-        !formData.password ||
-        !formData.endereco.cep ||
-        !formData.endereco.logradouro ||
-        !formData.endereco.numero ||
-        !formData.endereco.cidade ||
-        !formData.endereco.estado ||
-        !formData.endereco.bairro
-      ) {
-        alert("Por favor, preencha todos os campos obrigatórios");
+      if (!formData.user || !formData.password) {
+        alert("Por favor, preencha usuário e senha");
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        alert("A senha deve ter pelo menos 6 caracteres");
         return;
       }
 
       await register({
         user: formData.user,
-        password: formData.password,
-        cep: formData.endereco.cep,
-        logradouro: formData.endereco.logradouro,
-        numero: Number(formData.endereco.numero),
-        cidade: formData.endereco.cidade,
-        estado: formData.endereco.estado,
-        bairro: formData.endereco.bairro,
+        password: formData.password
       });
     } catch (error) {
       const errorMessage =

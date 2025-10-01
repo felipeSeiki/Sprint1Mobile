@@ -1,8 +1,51 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const api = axios.create({
-  baseURL: 'https://dashmottu-api.onrender.com',
+  baseURL: 'https://68db491123ebc87faa327b84.mockapi.io/mottu-api',
   headers: {
     'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  }
+});
+
+// Interceptor para adicionar o token de autenticação
+api.interceptors.request.use(
+  async config => {
+    const token = await AsyncStorage.getItem('@MottuApp:token');
+    if (token && config.headers) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
   },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para logar as requisições
+api.interceptors.request.use(request => {
+  console.log('Request:', {
+    url: request.url,
+    method: request.method,
+    data: request.data,
+    headers: request.headers
+  });
+  return request;
+}, error => {
+  console.error('Request Error:', error);
+  return Promise.reject(error);
+});
+
+// Interceptor para logar as respostas
+api.interceptors.response.use(response => {
+  console.log('Response:', {
+    status: response.status,
+    data: response.data,
+    headers: response.headers
+  });
+  return response;
+}, error => {
+  console.error('Response Error:', error.response || error);
+  return Promise.reject(error);
 });

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Image } from 'react-native';
-import { Avatar } from 'react-native-elements';
+import { Image, TouchableOpacity } from 'react-native';
+import { Avatar, Icon } from 'react-native-elements';
 import styled from 'styled-components/native';
 import { useAuth } from '../contexts/AuthContext';
 import theme from '../styles/theme';
@@ -52,24 +52,47 @@ const StyledTitle = styled.Text<HeaderTitleProps>`
 `;
 
 const Header: React.FC = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   if (!user) return null;
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
   return (
     <Container>
-      <UserInfo>
-        <Avatar
-          size="medium"
-          rounded
-          title={user.user.charAt(0).toUpperCase()}
-          containerStyle={styles.avatar}
+      <LogoContainer>
+        <Image
+          source={require('../../assets/MottuLogo.png')}
+          style={{ width: 120, height: 40, resizeMode: 'contain' }}
         />
-        <TextContainer>
-          <WelcomeText>Bem-vindo(a),</WelcomeText>
-          <UserName>{user.user}</UserName>
-        </TextContainer>
-      </UserInfo>
+      </LogoContainer>
+      <RightContent>
+        <UserInfo>
+          <Avatar
+            size="small"
+            rounded
+            title={user.user.charAt(0).toUpperCase()}
+            containerStyle={styles.avatar}
+          />
+          <TextContainer>
+            <UserName>{user.user}</UserName>
+          </TextContainer>
+        </UserInfo>
+        <TouchableOpacity onPress={handleLogout}>
+          <Icon
+            name="logout"
+            type="material"
+            color={theme.colors.primary}
+            size={24}
+          />
+        </TouchableOpacity>
+      </RightContent>
     </Container>
   );
 };
@@ -84,6 +107,20 @@ const Container = styled.View`
   background-color: ${theme.colors.background};
   padding: 16px;
   border-bottom-width: 1px;
+  border-bottom-color: ${theme.colors.primary};
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LogoContainer = styled.View`
+  flex: 1;
+`;
+
+const RightContent = styled.View`
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
 `;
 
 const UserInfo = styled.View`
@@ -92,17 +129,11 @@ const UserInfo = styled.View`
 `;
 
 const TextContainer = styled.View`
-  margin-left: 12px;
-`;
-
-const WelcomeText = styled.Text`
-  font-size: 14px;
-  color: ${theme.colors.text};
-  opacity: 0.7;
+  margin-left: 8px;
 `;
 
 const UserName = styled.Text`
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: ${theme.colors.text};
 `;

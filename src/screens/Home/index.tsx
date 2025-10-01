@@ -34,19 +34,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     return (
         <Container>
-            <HeaderContainer>
-                <Image
-                    source={require('../../../assets/MottuLogo.png')}
-                    style={styles.logo}
-                />
-                <TouchableOpacity
-                    style={styles.logOutButton}
-                    onPress={() => handleLogOut(navigation)}
-                >
-                    <Text style={styles.logOutText}>Sair</Text>
-                </TouchableOpacity>
-            </HeaderContainer>
-
             <CardContainer>
                 <AnimatedCardContainer
                     {...panResponder.panHandlers}
