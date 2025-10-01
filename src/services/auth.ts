@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Admin, AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
+import { Admin, AuthResponse, LoginCredentials, RegisterData, RegisterDataPatio, User, Users, Patio, UserRole } from '../types/auth';
 import { Moto } from '../types/motos';
 import { api } from '../config/api';
 
@@ -7,6 +7,7 @@ import { api } from '../config/api';
 const STORAGE_KEYS = {
   USER: '@MottuApp:user',
   TOKEN: '@MottuApp:token',
+  PATIO: '@MottuApp:patio',
   REGISTERED_USERS: '@MottuApp:registeredUsers',
   MOTOS: '@MottuApp:motos',
 };
@@ -42,12 +43,27 @@ const mockMotos = [
   },
 ];
 
+// Pátio padrão mockado
+const mockPatio = {
+  id: 'default_patio',
+  nome: 'Pátio Principal',
+  endereco: {
+    cep: '00000-000',
+    logradouro: 'Rua Principal',
+    numero: '1',
+    cidade: 'São Paulo',
+    estado: 'SP'
+  },
+  capacidade: 50,
+  status: 'ativo'
+};
+
 // Usuário padrão mockado
 const mockUser = {
   id: 'default_user',
   name: 'Usuário Padrão',
   email: 'usuario@sistema.com',
-  role: 'admin' as const,
+  role: 'ADMIN' as UserRole,
   image: 'https://randomuser.me/api/portraits/men/3.jpg',
   endereco: {
     cep: '00000-000',
@@ -64,40 +80,95 @@ let registeredUsers: User[] = [];
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
     if (credentials) {
-      const mockUser: Admin = await api.post('/auth/login', credentials).then(res => res.data);
+      const response = await api.post('/auth/login', credentials);
+      const user = response.data;
+      
+      // Salva o usuário no storage
+      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.data.token);
+
       return {
-        user: mockUser,
-        token: 'user-token',
+        user,
+        token: response.data.token,
       };
     }
 
     throw new Error('Email ou senha inválidos');
   },
 
+  async checkPatioExists(): Promise<boolean> {
+    try {
+      const response = await api.get('/api/patio/exists');
+      return response.data.exists;
+    } catch (error) {
+      console.error('Erro ao verificar existência do pátio:', error);
+      return false;
+    }
+  },
+
   async register(data: RegisterData): Promise<AuthResponse> {
-    // Cria um novo usuário administrador
-    const newUser: Admin = {
-      user: data.user,
-      role: 'ADMIN' as const,
-      password:data.password,
-      // endereco: {
-      //   cep: data.cep || '',
-      //   logradouro: data.logradouro || '',
-      //   numero: data.numero || '',
-      //   cidade: data.cidade || '',
-      //   estado: data.estado || ''
-      // }
-    };
+    const response = await api.post('/auth/register', data);
+    const user = response.data;
 
-    registeredUsers.push(newUser);
-
-    // Salva a lista atualizada de usuários
-    await api.post('/auth/register', newUser);
+    // Salva o usuário no storage
+    await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.data.token);
 
     return {
-      user: newUser,
-      token: `user-token-${newUser.id}`,
+      user,
+      token: response.data.token,
     };
+  },
+
+  async registerPatio(data: RegisterDataPatio): Promise<Patio> {
+    // Verifica se já existe um pátio registrado
+    const exists = await this.checkPatioExists();
+    if (exists) {
+      throw new Error('Já existe um pátio registrado no sistema');
+    }
+
+    // Registra o novo pátio
+    const response = await api.post('/api/patio', data);
+    const patio = response.data;
+
+    // Salva o pátio no storage local
+    await AsyncStorage.setItem(STORAGE_KEYS.PATIO, JSON.stringify(patio));
+
+    return patio;
+  },
+
+  async getPatio(): Promise<Patio | null> {
+    try {
+      // Primeiro tenta obter do backend
+      const response = await api.get('/api/patio');
+      const patio = response.data;
+      
+      // Atualiza o storage local
+      if (patio) {
+        await AsyncStorage.setItem(STORAGE_KEYS.PATIO, JSON.stringify(patio));
+      }
+      
+      return patio;
+    } catch (error) {
+      console.error('Erro ao obter pátio do backend:', error);
+      // Se falhar, tenta obter do storage local
+      return this.getStoredPatio();
+    }
+  },
+
+  // Novo método para vincular usuário a um pátio
+  async linkUserToPatio(userId: string, patioId: string): Promise<void> {
+    await api.post('/user/link-patio', { userId, patioId });
+    
+    // Atualiza o usuário local se for o usuário atual
+    const currentUser = await this.getStoredUser();
+    if (currentUser && currentUser.id === userId) {
+      const updatedUser = {
+        ...currentUser,
+        patioId
+      };
+      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(updatedUser));
+    }
   },
 
   async signOut(): Promise<void> {
@@ -106,7 +177,7 @@ export const authService = {
     await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
   },
 
-  async getStoredUser(): Promise<User | null> {
+  async getStoredUser(): Promise<Users | null> {
     try {
       const userJson = await AsyncStorage.getItem(STORAGE_KEYS.USER);
       if (userJson) {
@@ -115,6 +186,19 @@ export const authService = {
       return null;
     } catch (error) {
       console.error('Erro ao obter usuário armazenado:', error);
+      return null;
+    }
+  },
+
+  async getStoredPatio(): Promise<Patio | null> {
+    try {
+      const patioJson = await AsyncStorage.getItem(STORAGE_KEYS.PATIO);
+      if (patioJson) {
+        return JSON.parse(patioJson);
+      }
+      return null;
+    } catch (error) {
+      console.error('Erro ao obter pátio armazenado:', error);
       return null;
     }
   },

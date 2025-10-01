@@ -5,7 +5,7 @@
 /**
  * Perfis de usuário disponíveis no sistema
  */
-export type UserRole = "ADMIN" | "OPERATOR";
+export type UserRole = "ADMIN" | "USER";
 
 /**
  * Interface base do usuário
@@ -20,30 +20,31 @@ export interface BaseUser {
 /**
  * Interface do paciente
  */
-export interface Operator extends BaseUser {
-  role: "OPERATOR";
+export interface Patio {
+  id: number;
+  endereco: {
+    cep: string;
+    logradouro: string;
+    numero: number;
+    cidade: string;
+    estado: string;
+    bairro: string;
+  };
+  imagemPlantaUrl: string;
 }
 
-/**
- * Interface do administrador
- */
-export interface Address {
-  cep: string;
-  logradouro: string;
-  numero: string;
-  cidade: string;
-  estado: string;
+export interface User extends BaseUser {
+  role: "USER";
 }
 
 export interface Admin extends BaseUser {
   role: "ADMIN";
-  endereco?: Address;
 }
 
 /**
  * Interface do usuário autenticado
  */
-export type User = Admin | Operator;
+export type Users = Admin | User;
 
 /**
  * Dados necessários para login
@@ -61,26 +62,43 @@ export interface RegisterData {
   password: string;
   cep?: string;
   logradouro?: string;
-  numero?: string;
+  bairro?: string;
+  numero?: number;
   cidade?: string;
   estado?: string;
+}
+
+export interface RegisterDataPatio {
+  endereco: {
+    cep: string;
+    logradouro: string;
+    numero: number;
+    cidade: string;
+    estado: string;
+    bairro: string;
+  };
+  imagemPlantaUrl: string;
 }
 
 /**
  * Resposta da API de autenticação
  */
 export interface AuthResponse {
-  user: User;
+  user: Users;
   token: string;
 }
 
-/**
- * Contexto de autenticação
- */
+// Removido pois já está definido acima
+
 export interface AuthContextData {
-  user: User | null;
+  user: Users | null;
+  patio: Patio | null;
   loading: boolean;
   signIn: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  registerPatio: (data: RegisterDataPatio) => Promise<void>;
   signOut: () => Promise<void>;
+  hasRegisteredPatio: boolean;
+  setPatio: (patio: Patio | null) => void;
+  setHasRegisteredPatio: (value: boolean) => void;
 }

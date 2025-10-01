@@ -5,11 +5,15 @@ interface FormsDatasProps {
     formData: {
         user: string;
         password: string;
-        cep: string;
-        logradouro: string;
-        numero: string;
-        cidade: string;
-        estado: string;
+        endereco: {
+            logradouro: string,
+            numero: string,
+            bairro: string,
+            cidade: string,
+            estado: string,
+            cep: string,
+        },
+        imagemPlantaUrl: string
     };
     handleChange: (name: string, value: string) => void;
     handleSubmit: () => void;
@@ -33,25 +37,13 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
             </View>
 
             <View style={styles.formGroup}>
-                <Text style={styles.label}>Senha:</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Digite sua senha"
-                    placeholderTextColor="#999"
-                    secureTextEntry
-                    value={formData.password}
-                    onChangeText={(text) => handleChange('password', text)}
-                />
-            </View>
-
-            <View style={styles.formGroup}>
                 <Text style={styles.label}>CEP:</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Digite seu CEP"
                     placeholderTextColor="#999"
                     keyboardType="numeric"
-                    value={formData.cep}
+                    value={formData.endereco.cep}
                     onChangeText={(text) => handleChange('cep', text)}
                 />
             </View>
@@ -62,7 +54,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     style={styles.input}
                     placeholder="Rua/Avenida"
                     placeholderTextColor="#999"
-                    value={formData.logradouro}
+                    value={formData.endereco.logradouro}
                     onChangeText={(text) => handleChange('logradouro', text)}
                 />
             </View>
@@ -74,7 +66,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     placeholder="Número"
                     placeholderTextColor="#999"
                     keyboardType="numeric"
-                    value={formData.numero}
+                    value={formData.endereco.numero}
                     onChangeText={(text) => handleChange('numero', text)}
                 />
             </View>
@@ -85,7 +77,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     style={styles.input}
                     placeholder="Sua cidade"
                     placeholderTextColor="#999"
-                    value={formData.cidade}
+                    value={formData.endereco.cidade}
                     onChangeText={(text) => handleChange('cidade', text)}
                 />
             </View>
@@ -96,7 +88,7 @@ export const FormsDatas: React.FC<FormsDatasProps> = ({ formData, handleChange, 
                     style={styles.input}
                     placeholder="UF"
                     placeholderTextColor="#999"
-                    value={formData.estado}
+                    value={formData.endereco.estado}
                     onChangeText={(text) => handleChange('estado', text)}
                     maxLength={2}
                 />

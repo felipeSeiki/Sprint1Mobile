@@ -1,16 +1,17 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { LoginScreen } from '../screens/LoginScreen';
-import { RegisterScreen } from '../screens/RegisterScreen';
-import HomeScreen from '../screens/HomeScreen';
-import { RegisterMotosScreen } from '../screens/RegisterMotoScreen';
+import { LoginScreen } from '../screens/Login';
+import { RegisterScreen } from '../screens/Register';
+import HomeScreen from '../screens/Home';
+import { RegisterMotosScreen } from '../screens/RegisterMoto';
 import { useAuth } from '../contexts/AuthContext';
 import { RootStackParamList } from '../types/navigation';
-import DashboardScreen from '../screens/DashboardScreen';
+import DashboardScreen from '../screens/DashBoard';
+import { RegisterPatioScreen } from '../screens/RegisterPatioScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppRoutes() {
-  const { user } = useAuth();
+  const { user, hasRegisteredPatio } = useAuth();
 
   return (
     <Stack.Navigator
@@ -24,6 +25,16 @@ export default function AppRoutes() {
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Register" component={RegisterScreen} />
         </>
+      ) : user.role === 'ADMIN' && !hasRegisteredPatio ? (
+        // Rota de registro do pátio para admin
+        <Stack.Screen 
+          name="RegisterPatio" 
+          component={RegisterPatioScreen}
+          options={{ 
+            title: 'Registrar Pátio',
+            headerLeft: () => null // Impede voltar
+          }} 
+        />
       ) : (
         // Rotas protegidas
         <>

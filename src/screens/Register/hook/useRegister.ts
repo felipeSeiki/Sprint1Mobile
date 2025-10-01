@@ -10,11 +10,15 @@ export const useRegister = () => {
   const [formData, setFormData] = useState({
     user: "",
     password: "",
-    cep: "",
-    logradouro: "",
-    numero: "",
-    cidade: "",
-    estado: "",
+    endereco: {
+      logradouro: "",
+      numero: 0,
+      bairro: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+    },
+    imagemPlantaUrl: "",
   });
 
   const handleChange = (name: string, value: string) => {
@@ -29,11 +33,12 @@ export const useRegister = () => {
       if (
         !formData.user ||
         !formData.password ||
-        !formData.cep ||
-        !formData.logradouro ||
-        !formData.numero ||
-        !formData.cidade ||
-        !formData.estado
+        !formData.endereco.cep ||
+        !formData.endereco.logradouro ||
+        !formData.endereco.numero ||
+        !formData.endereco.cidade ||
+        !formData.endereco.estado ||
+        !formData.endereco.bairro
       ) {
         alert("Por favor, preencha todos os campos obrigatórios");
         return;
@@ -42,11 +47,12 @@ export const useRegister = () => {
       await register({
         user: formData.user,
         password: formData.password,
-        cep: formData.cep,
-        logradouro: formData.logradouro,
-        numero: formData.numero,
-        cidade: formData.cidade,
-        estado: formData.estado,
+        cep: formData.endereco.cep,
+        logradouro: formData.endereco.logradouro,
+        numero: Number(formData.endereco.numero),
+        cidade: formData.endereco.cidade,
+        estado: formData.endereco.estado,
+        bairro: formData.endereco.bairro,
       });
     } catch (error) {
       const errorMessage =

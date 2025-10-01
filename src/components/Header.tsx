@@ -1,17 +1,54 @@
 import React from 'react';
+import { Image } from 'react-native';
 import { Avatar } from 'react-native-elements';
 import styled from 'styled-components/native';
 import { useAuth } from '../contexts/AuthContext';
 import theme from '../styles/theme';
 
-export const HeaderContainer = styled.View`
+interface HeaderContainerProps {
+  title?: string;
+  showLogo?: boolean;
+}
+
+export const HeaderContainer: React.FC<HeaderContainerProps> = ({ title, showLogo = true }) => {
+  return (
+    <StyledHeaderContainer>
+      {showLogo ? (
+        <Image
+          source={require('../../assets/MottuLogo.png')}
+          style={{ width: 120, height: 40, resizeMode: 'contain' }}
+        />
+      ) : null}
+      {title ? (
+        <StyledTitle showLogo={showLogo}>{title}</StyledTitle>
+      ) : null}
+    </StyledHeaderContainer>
+  );
+};
+
+interface StyledContainerProps {
+  showLogo?: boolean;
+}
+
+const StyledHeaderContainer = styled.View<StyledContainerProps>`
   background-color: ${theme.colors.background};
   padding: 16px;
   border-bottom-width: 1px;
   border-bottom-color: #00CF3A;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: ${(props: StyledContainerProps) => props.showLogo ? 'space-between' : 'center'};
   align-items: center;
+`;
+
+interface HeaderTitleProps {
+  showLogo?: boolean;
+}
+
+const StyledTitle = styled.Text<HeaderTitleProps>`
+  font-size: ${theme.typography.title.fontSize}px;
+  font-weight: bold;
+  color: ${theme.colors.text};
+  ${(props: HeaderTitleProps) => props.showLogo ? 'flex: 1; text-align: right;' : ''};
 `;
 
 const Header: React.FC = () => {
@@ -25,12 +62,12 @@ const Header: React.FC = () => {
         <Avatar
           size="medium"
           rounded
-          source={{ uri: user.image }}
+          title={user.user.charAt(0).toUpperCase()}
           containerStyle={styles.avatar}
         />
         <TextContainer>
           <WelcomeText>Bem-vindo(a),</WelcomeText>
-          <UserName>{user.name}</UserName>
+          <UserName>{user.user}</UserName>
         </TextContainer>
       </UserInfo>
     </Container>

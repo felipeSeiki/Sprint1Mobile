@@ -1,43 +1,47 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/auth';
-import { AuthContextData, LoginCredentials, RegisterData, User } from '../types/auth';
+import { AuthContextData, LoginCredentials, RegisterData, RegisterDataPatio, User, Users, Patio } from '../types/auth';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
-  USER: '@MedicalApp:user',
-  TOKEN: '@MedicalApp:token',
+  USER: '@MottuApp:user',
+  TOKEN: '@MottuApp:token',
+  PATIO: '@MottuApp:patio',
 };
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Users | null>(null);
+  const [patio, setPatio] = useState<Patio | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasRegisteredPatio, setHasRegisteredPatio] = useState(false);
 
   useEffect(() => {
-    loadStoredUser();
-    loadRegisteredUsers();
+    loadStoredData();
   }, []);
 
-  const loadStoredUser = async () => {
+  const loadStoredData = async () => {
     try {
       const storedUser = await authService.getStoredUser();
+      
       if (storedUser) {
         setUser(storedUser);
+        
+        // Se for admin, verifica a existência do pátio no backend
+        if (storedUser.role === 'ADMIN') {
+          const existingPatio = await authService.getPatio();
+          if (existingPatio) {
+            setPatio(existingPatio);
+            setHasRegisteredPatio(true);
+          }
+        }
       }
     } catch (error) {
-      console.error('Erro ao carregar usuário:', error);
+      console.error('Erro ao carregar dados:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadRegisteredUsers = async () => {
-    try {
-      await authService.loadRegisteredUsers();
-    } catch (error) {
-      console.error('Erro ao carregar usuários registrados:', error);
     }
   };
 
@@ -47,6 +51,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(response.user);
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.user));
       await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
+      
+      // Carrega o pátio se o usuário for admin
+      if (response.user.role === 'ADMIN') {
+        const storedPatio = await authService.getStoredPatio();
+        if (storedPatio) {
+          setPatio(storedPatio);
+          setHasRegisteredPatio(true);
+        }
+      }
     } catch (error) {
       throw error;
     }
@@ -74,8 +87,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const registerPatio = async (data: RegisterDataPatio) => {
+    try {
+      const patio = await authService.registerPatio(data);
+      setPatio(patio);
+      setHasRegisteredPatio(true);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, register, signOut }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        patio,
+        loading, 
+        signIn, 
+        register, 
+        registerPatio,
+        signOut,
+        hasRegisteredPatio,
+        setPatio,
+        setHasRegisteredPatio 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
