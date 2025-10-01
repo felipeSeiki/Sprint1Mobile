@@ -9,6 +9,7 @@ import {
 import { styles } from './styles';
 import { useRegisterMoto } from './hooks/useRegisterMoto';
 import { RegisterMotoInputs } from './components/RegisterMotoInputs';
+import ProtectedLayout from '../../components/ProtectedLayout';
 
 export const RegisterMotosScreen: React.FC = () => {
     const {
@@ -19,27 +20,29 @@ export const RegisterMotosScreen: React.FC = () => {
     } = useRegisterMoto();
 
     return (
-        <SafeAreaView style={styles.container}>
-            <ScrollView
-                contentContainerStyle={styles.scrollContainer}
-                keyboardShouldPersistTaps="handled"
-            >
-                <View style={styles.content}>
-                    <RegisterMotoInputs
-                        formData={formData}
-                        handleChange={handleChange}
-                        validStatuses={validStatuses}
-                    />
+        <ProtectedLayout>
+            <SafeAreaView style={styles.container}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContainer}
+                    keyboardShouldPersistTaps="handled"
+                >
+                    <View style={styles.content}>
+                        <RegisterMotoInputs
+                            formData={formData}
+                            handleChange={handleChange}
+                            validStatuses={validStatuses}
+                        />
 
-                    <TouchableOpacity
-                        style={styles.submitButton}
-                        onPress={handleSubmit}
-                        activeOpacity={0.8}
-                    >
-                        <Text style={styles.buttonText}>CADASTRAR MOTO</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+                        <TouchableOpacity
+                            style={styles.submitButton}
+                            onPress={handleSubmit}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.buttonText}>CADASTRAR MOTO</Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </SafeAreaView>
+        </ProtectedLayout>
     );
 };

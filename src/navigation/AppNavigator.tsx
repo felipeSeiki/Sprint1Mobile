@@ -49,12 +49,8 @@ export const AppNavigator: React.FC = () => {
             />
             <Stack.Screen
               name="RegisterMoto"
-              component={(props: NativeStackScreenProps<RootStackParamList, 'RegisterMoto'>) => (
-                <ProtectedLayout>
-                  <RegisterMotosScreen {...props} />
-                </ProtectedLayout>
-              )}
-              options={{ title: 'Registrar Moto' }}
+              component={RegisterMotosScreen}
+              options={{ title: "Registrar Moto" }}
             />
             <Stack.Screen
               name="Dashboard"
