@@ -5,7 +5,7 @@ export const styles = StyleSheet.create({
     width: 120,
     height: 40,
     resizeMode: 'contain',
-    marginLeft: -25, // Para alinhar melhor o logo
+    marginBottom: 25,
   },
   container: {
     flex: 1,

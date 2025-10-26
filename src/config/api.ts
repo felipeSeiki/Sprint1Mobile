@@ -12,7 +12,7 @@ export const api = axios.create({
 // Interceptor para adicionar o token de autenticação
 api.interceptors.request.use(
   async config => {
-    const token = await AsyncStorage.getItem('@MottuApp:token');
+    const token = process.env.API_TOKEN;
     if (token && config.headers) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

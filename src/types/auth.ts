@@ -50,7 +50,7 @@ export type Users = Admin | User;
  * Dados necessários para login
  */
 export interface LoginCredentials {
-  user: string;
+  login: string;
   password: string;
 }
 

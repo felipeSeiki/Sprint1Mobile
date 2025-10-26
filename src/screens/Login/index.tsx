@@ -15,17 +15,14 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderContainer>
-        <Image 
-          source={require('../../../assets/MottuLogo.png')}
-          style={styles.logo}
-        />    
-      </HeaderContainer>
-
       <View style={styles.content}>
         <View style={styles.loginContainer}>
+          <Image
+            source={require('../../../assets/MottuLogo.png')}
+            style={styles.logo}
+          />
           <Text style={styles.title}>LOGIN</Text>
-          
+
           <LoginInputs
             user={user}
             setUser={setUser}
@@ -35,13 +32,6 @@ export const LoginScreen: React.FC = () => {
 
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.buttonText}>{`>`}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.registerLink} 
-            onPress={() => navigation.navigate('Register')}
-          >
-            <Text style={styles.registerText}>Não possui login? Cadastre-se</Text>
           </TouchableOpacity>
         </View>
       </View>

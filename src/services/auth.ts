@@ -79,18 +79,15 @@ let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
-    if (!credentials.user || !credentials.password) {
+    if (!credentials.login || !credentials.password) {
       throw new Error('Usuário e senha são obrigatórios');
     }
 
     try {
       // Busca o usuário pelo username
-      const response = await api.get(`/users?user=${credentials.user}`);
-      const users = response.data;
-      
-      // Verifica se encontrou o usuário e se a senha está correta
-      const user = users.find((u: Users) => u.user === credentials.user && u.password === credentials.password);
-      
+      const response = await api.post(`/auth/login`, credentials);
+      const user = response.data;
+
       if (!user) {
         throw new Error('Usuário ou senha inválidos');
       }
@@ -117,7 +114,7 @@ export const authService = {
 
   async checkPatioExists(): Promise<boolean> {
     try {
-      const response = await api.get('/api/patio/exists');
+      const response = await api.get(`/api/patio/{user.id}`)
       return response.data.exists;
     } catch (error) {
       console.error('Erro ao verificar existência do pátio:', error);
