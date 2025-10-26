@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const api = axios.create({
-  baseURL: 'https://68db491123ebc87faa327b84.mockapi.io/mottu-api',
+  baseURL: process.env.BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

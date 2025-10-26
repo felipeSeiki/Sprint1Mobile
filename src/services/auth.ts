@@ -131,12 +131,6 @@ export const authService = {
         throw new Error('Usuário e senha são obrigatórios');
       }
 
-      // Verifica se o usuário já existe
-      const existingUsers = await api.get(`/users?user=${data.user}`);
-      if (existingUsers.data.length > 0) {
-        throw new Error('Usuário já existe');
-      }
-
       // Cria o novo usuário
       const newUser = {
         user: data.user,
@@ -144,7 +138,7 @@ export const authService = {
         role: 'USER' as UserRole
       };
 
-      const response = await api.post('/users', newUser);
+      const response = await api.post('/auth/register', newUser);
       const user = response.data;
 
       // Gera um token mock (em produção isso seria feito pelo servidor)
