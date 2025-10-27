@@ -82,43 +82,51 @@ export const authService = {
     if (!credentials.user || !credentials.password) {
       throw new Error('Usuário e senha são obrigatórios');
     }
-
     try {
-      // Busca o usuário pelo username
-      const response = await api.get(`/users?user=${credentials.user}`);
-      const users = response.data;
-      
-      // Verifica se encontrou o usuário e se a senha está correta
-      const user = users.find((u: Users) => u.user === credentials.user && u.password === credentials.password);
-      
-      if (!user) {
-        throw new Error('Usuário ou senha inválidos');
+      // Call backend login endpoint (expects { login, password })
+      const payload = { login: credentials.user, password: credentials.password };
+      const response = await api.post('/auth/login', payload);
+      const data = response.data || {};
+
+      // backend may return { token, user } or user directly
+      const token = data.token ?? data.accessToken ?? null;
+
+      // Determine whether response contains a user object or just token
+      let user: any = null;
+      if (data && typeof data === 'object') {
+        if (data.user) {
+          user = data.user;
+        } else {
+          // if data has typical user fields, treat it as user
+          const maybeUser = data;
+          if (maybeUser.id || maybeUser.login || maybeUser.user || maybeUser.name || maybeUser.email) {
+            user = maybeUser;
+          }
+        }
       }
 
-      // Gera um token mock (em produção isso seria feito pelo servidor)
-      const token = btoa(JSON.stringify({ userId: user.id, timestamp: Date.now() }));
-      
-      // Salva o usuário no storage
-      await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      const finalToken = token ?? btoa(JSON.stringify({ userId: (user && (user.id || user.login)) || credentials.user, timestamp: Date.now() }));
 
-      return {
-        user,
-        token,
-      };
+      // save token and user if present
+      if (user) {
+        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+      }
+      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, finalToken);
+
+      return { user, token: finalToken } as AuthResponse;
     } catch (error: any) {
       console.error('Erro no login:', error.response || error);
-      if (error.message === 'Usuário ou senha inválidos') {
-        throw error;
-      }
-      throw new Error('Erro ao fazer login. Tente novamente.');
+      const message = error?.response?.data?.message || 'Erro ao fazer login. Tente novamente.';
+      throw new Error(message);
     }
   },
 
   async checkPatioExists(): Promise<boolean> {
     try {
-      const response = await api.get('/api/patio/exists');
-      return response.data.exists;
+      const response = await api.get('/api/patio');
+      const data = response.data;
+      if (Array.isArray(data)) return data.length > 0;
+      return !!data;
     } catch (error) {
       console.error('Erro ao verificar existência do pátio:', error);
       return false;
@@ -131,14 +139,14 @@ export const authService = {
         throw new Error('Usuário e senha são obrigatórios');
       }
 
-      // Cria o novo usuário
-      const newUser = {
-        user: data.user,
+      // Cria o novo usuário (map para os campos esperados pelo backend)
+      const body = {
+        login: data.user,
         password: data.password,
         role: 'USER' as UserRole
       };
 
-      const response = await api.post('/auth/register', newUser);
+      const response = await api.post('/auth/register', body);
       const user = response.data;
 
       // Gera um token mock (em produção isso seria feito pelo servidor)
@@ -186,13 +194,14 @@ export const authService = {
     try {
       // Primeiro tenta obter do backend
       const response = await api.get('/api/patio');
-      const patio = response.data;
-      
+      const data = response.data;
+      const patio = Array.isArray(data) ? data[0] ?? null : data;
+
       // Atualiza o storage local
       if (patio) {
         await AsyncStorage.setItem(STORAGE_KEYS.PATIO, JSON.stringify(patio));
       }
-      
+
       return patio;
     } catch (error) {
       console.error('Erro ao obter pátio do backend:', error);

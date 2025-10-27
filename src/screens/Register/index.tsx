@@ -17,12 +17,8 @@ export const RegisterScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <HeaderContainer>
-                <Image
-                    source={require('../../../assets/MottuLogo.png')}
-                    style={styles.logo}
-                />
-            </HeaderContainer>
+            <HeaderContainer/>
+                
             <ScrollView
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}

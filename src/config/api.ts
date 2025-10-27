@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const api = axios.create({
-  baseURL: process.env.BACKEND_URL,
+  baseURL: process.env.BACKEND_URL || 'https://dashmottu-api.onrender.com',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
