@@ -35,7 +35,7 @@ const Actions = styled.View`
 
 const ActionButton = styled.TouchableOpacity<{ color?: string }>`
   padding: 8px 10px;
-  background-color: ${props => props.color || theme.colors.primary};
+  background-color: ${(props: { color: any; }) => props.color || theme.colors.primary};
   border-radius: 6px;
 `;
 
