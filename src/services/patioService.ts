@@ -49,6 +49,50 @@ export const patioService = {
     }
   },
 
+  // Lista todos os pátios (tenta backend, senão fallback para storage)
+  async getAllPatios(): Promise<Patio[]> {
+    try {
+      // tentar backend
+      const response = await api.get('/api/patio');
+      const data = response.data;
+      if (Array.isArray(data)) {
+        return data;
+      }
+      if (data) return [data];
+      return [];
+    } catch (error) {
+      // fallback para storage - neste app anterior armazenamos somente 1 pátio
+      try {
+        const patio = await this.getPatio();
+        return patio ? [patio] : [];
+      } catch (e) {
+        console.error('Erro ao listar pátios (fallback):', e);
+        return [];
+      }
+    }
+  },
+
+  // Deleta um pátio por id (tenta backend, senão fallback para storage)
+  async deletePatioById(id: number): Promise<void> {
+    try {
+      await api.delete(`/api/patio/${id}`);
+      // se sucesso, remover local se igual
+      const current = await this.getPatio();
+      if (current && Number(current.id) === Number(id)) {
+        await AsyncStorage.removeItem(STORAGE_KEYS.PATIO);
+      }
+    } catch (error) {
+      console.warn('Erro ao deletar pátio no backend, tentando fallback:', error);
+      // fallback: se o stored patio tem esse id, remove
+      const current = await this.getPatio();
+      if (current && Number(current.id) === Number(id)) {
+        await AsyncStorage.removeItem(STORAGE_KEYS.PATIO);
+        return;
+      }
+      throw new Error('Falha ao deletar pátio');
+    }
+  },
+
   // Registra um novo pátio
   async createPatio(data: CreatePatioDTO): Promise<Patio> {
     try {
@@ -88,6 +132,35 @@ export const patioService = {
     } catch (error) {
       console.error('Erro ao atualizar pátio:', error);
       throw new Error('Erro ao atualizar pátio');
+    }
+  },
+
+  // Atualiza um pátio por id (tenta backend, senão fallback)
+  async updatePatioById(id: number, data: Partial<CreatePatioDTO>): Promise<Patio> {
+    try {
+      const response = await api.put(`/api/patio/${id}`, data);
+      const updated = response.data;
+      // update local storage if matches
+      const current = await this.getPatio();
+      if (current && Number(current.id) === Number(id)) {
+        await AsyncStorage.setItem(STORAGE_KEYS.PATIO, JSON.stringify(updated));
+      }
+      return updated;
+    } catch (error) {
+      // fallback to local update
+      return this.updatePatio(id, data);
+    }
+  },
+
+  // Obtém pátio por id (tenta backend, senão fallback)
+  async getPatioById(id: number): Promise<Patio | null> {
+    try {
+      const response = await api.get(`/api/patio/${id}`);
+      return response.data;
+    } catch (error) {
+      const current = await this.getPatio();
+      if (current && Number(current.id) === Number(id)) return current;
+      return null;
     }
   },
 

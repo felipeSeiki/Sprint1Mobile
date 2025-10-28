@@ -133,20 +133,26 @@ export const authService = {
     }
   },
 
-  async register(data: RegisterData): Promise<AuthResponse> {
+  async register(data: RegisterData | any): Promise<AuthResponse> {
     try {
       if (!data.user || !data.password) {
         throw new Error('Usuário e senha são obrigatórios');
       }
 
       // Cria o novo usuário (map para os campos esperados pelo backend)
-      const body = {
+      const body: any = {
         login: data.user,
         password: data.password,
-        role: 'USER' as UserRole
+        role: (data.role as UserRole) ?? 'USER'
       };
 
-      const response = await api.post('/auth/register', body);
+      // Se o backend espera id-patio como query param, passamos se existir
+      const config: any = {};
+      if (data.patioId) {
+        config.params = { 'id-patio': data.patioId };
+      }
+
+      const response = await api.post('/auth/register', body, config);
       const user = response.data;
 
       // Gera um token mock (em produção isso seria feito pelo servidor)

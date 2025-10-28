@@ -1,7 +1,10 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RegisterScreenNavigationProp } from "../type/type";
+import { RootStackParamList } from '../../../types/navigation';
+
+type RegisterRouteProp = RouteProp<RootStackParamList, 'Register'>;
 
 export const useRegister = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
@@ -11,6 +14,18 @@ export const useRegister = () => {
     user: "",
     password: "",
   });
+
+  const route = useRoute<RegisterRouteProp>();
+
+  useEffect(() => {
+    // se vier prefill por params (role, patioId), podemos pré-configurar campos
+    if (route?.params) {
+      const params: any = route.params as any;
+      if (params.prefillUser) {
+        setFormData((prev) => ({ ...prev, user: params.prefillUser }));
+      }
+    }
+  }, [route?.params]);
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({
@@ -31,9 +46,13 @@ export const useRegister = () => {
         return;
       }
 
+      // Se a rota enviou role/patioId, encaminhar para o serviço
+      const params: any = (route && (route.params as any)) || {};
       await register({
         user: formData.user,
-        password: formData.password
+        password: formData.password,
+        role: params.role,
+        patioId: params.patioId
       });
     } catch (error) {
       const errorMessage =

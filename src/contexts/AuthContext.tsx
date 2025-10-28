@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/auth';
-import { AuthContextData, LoginCredentials, RegisterData, RegisterDataPatio, User, Users, Patio } from '../types/auth';
+import { AuthContextData, LoginCredentials, RegisterData, RegisterDataPatio, RegisterDataWithRole, User, Users, Patio } from '../types/auth';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const register = async (data: RegisterData) => {
+  const register = async (data: RegisterDataWithRole | RegisterData) => {
     try {
       const response = await authService.register(data);
 
