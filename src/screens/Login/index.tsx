@@ -15,13 +15,7 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderContainer>
-        <Image 
-          source={require('../../../assets/MottuLogo.png')}
-          style={styles.logo}
-        />    
-      </HeaderContainer>
-
+      <HeaderContainer/>
       <View style={styles.content}>
         <View style={styles.loginContainer}>
           <Text style={styles.title}>LOGIN</Text>

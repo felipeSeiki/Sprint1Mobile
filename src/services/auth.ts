@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Admin, AuthResponse, LoginCredentials, RegisterData, RegisterDataPatio, User, Users, Patio, UserRole } from '../types/auth';
 import { Moto } from '../types/motos';
 import { api } from '../config/api';
+import { USE_MOCKS } from '../config/useMock';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -83,6 +84,27 @@ export const authService = {
       throw new Error('Usuário e senha são obrigatórios');
     }
     try {
+      // Modo mock: retorna usuários pré-definidos sem chamada à API
+      if (USE_MOCKS) {
+        const uname = String(credentials.user).toLowerCase();
+        let role: UserRole = 'USER';
+        if (uname.includes('master')) role = 'MASTER';
+        else if (uname.includes('admin')) role = 'ADMIN';
+
+        const mockUserLocal: any = {
+          id: `${role.toLowerCase()}_id`,
+          user: credentials.user,
+          role,
+          password: credentials.password,
+          name: `${role} Mock`,
+          email: `${credentials.user}@mock.local`
+        };
+
+        const token = btoa(JSON.stringify({ mock: true, role, ts: Date.now() }));
+        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUserLocal));
+        await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        return { user: mockUserLocal, token } as AuthResponse;
+      }
       // Call backend login endpoint (expects { login, password })
       const payload = { login: credentials.user, password: credentials.password };
       const response = await api.post('/auth/login', payload);
