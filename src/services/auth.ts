@@ -80,7 +80,7 @@ let registeredUsers: User[] = [];
 
 export const authService = {
   async signIn(credentials: LoginCredentials): Promise<AuthResponse> {
-    if (!credentials.user || !credentials.password) {
+    if (!credentials.login || !credentials.password) {
       throw new Error('Usuário e senha são obrigatórios');
     }
     try {
