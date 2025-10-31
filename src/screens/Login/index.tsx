@@ -15,6 +15,8 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <HeaderContainer/>
+
       <View style={styles.content}>
         <View style={styles.loginContainer}>
           <Image

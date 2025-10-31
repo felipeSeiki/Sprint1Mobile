@@ -74,15 +74,23 @@ const Header: React.FC = () => {
       </LogoContainer>
       <RightContent>
         <UserInfo>
-          <Avatar
-            size="small"
-            rounded
-            title={user.user.charAt(0).toUpperCase()}
-            containerStyle={styles.avatar}
-          />
-          <TextContainer>
-            <UserName>{user.user}</UserName>
-          </TextContainer>
+            {(() => {
+              const displayName = (user && (user.user || (user as any).login || (user as any).name || (user as any).email)) || '';
+              const initial = displayName ? String(displayName).charAt(0).toUpperCase() : '?';
+              return (
+                <>
+                  <Avatar
+                    size="small"
+                    rounded
+                    title={initial}
+                    containerStyle={styles.avatar}
+                  />
+                  <TextContainer>
+                    <UserName>{displayName || 'Usuário'}</UserName>
+                  </TextContainer>
+                </>
+              );
+            })()}
         </UserInfo>
         <TouchableOpacity onPress={handleLogout}>
           <Icon

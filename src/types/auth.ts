@@ -5,7 +5,7 @@
 /**
  * Perfis de usuário disponíveis no sistema
  */
-export type UserRole = "ADMIN" | "USER";
+export type UserRole = "MASTER" | "ADMIN" | "USER";
 
 /**
  * Interface base do usuário
@@ -41,10 +41,14 @@ export interface Admin extends BaseUser {
   role: "ADMIN";
 }
 
+export interface Master extends BaseUser {
+  role: "MASTER";
+}
+
 /**
  * Interface do usuário autenticado
  */
-export type Users = Admin | User;
+export type Users = Admin | User | Master;
 
 /**
  * Dados necessários para login
@@ -60,6 +64,11 @@ export interface LoginCredentials {
 export interface RegisterData {
   user: string;
   password: string;
+}
+
+export interface RegisterDataWithRole extends RegisterData {
+  role?: 'MASTER' | 'ADMIN' | 'USER';
+  patioId?: number;
 }
 
 export interface RegisterDataPatio {
@@ -89,7 +98,7 @@ export interface AuthContextData {
   patio: Patio | null;
   loading: boolean;
   signIn: (credentials: LoginCredentials) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  register: (data: RegisterDataWithRole | RegisterData) => Promise<void>;
   registerPatio: (data: RegisterDataPatio) => Promise<void>;
   signOut: () => Promise<void>;
   hasRegisteredPatio: boolean;

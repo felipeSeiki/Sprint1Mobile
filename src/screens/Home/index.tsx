@@ -3,6 +3,7 @@ import { Text, Modal, PanResponder, Animated, TouchableOpacity, Image } from 're
 import { HomeScreenProps } from './type/type';
 import { AddButton, AddButtonText, AnimatedCardContainer, BikeIcon, BikeSpot, BottomContainer, Card, CardContainer, Column, Container, EmptySpace, Row, styles } from './styles';
 import { HeaderContainer } from '../../components/Header';
+import { useAuth } from '../../contexts/AuthContext';
 import { useHome } from './hook/useHome';
 import { parkingSpots } from './models/parkSpotsMock';
 
@@ -17,6 +18,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         handleLogOut,
         getSpotColor
     } = useHome();
+
+    const { user } = useAuth();
 
     const renderMotoSpot = (x: number, y: number) => {
         const moto = motos.find(m => m.posicaoX === x.toString() && m.posicaoY === y.toString());
@@ -74,6 +77,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <AddButton onPress={() => navigation.navigate('Dashboard')}>
                     <AddButtonText>DashBoard</AddButtonText>
                 </AddButton>
+                {user && (user.role === 'MASTER') ? (
+                  <AddButton onPress={() => navigation.navigate('AdminDashboard')}>
+                    <AddButtonText>Admin</AddButtonText>
+                  </AddButton>
+                ) : null}
                 <AddButton onPress={() => navigation.navigate('RegisterMoto')}>
                     <AddButtonText>+ ADD MOTO</AddButtonText>
                 </AddButton>

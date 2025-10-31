@@ -3,12 +3,18 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { RegisterDataPatio } from "../../../types/auth";
 import { Alert } from "react-native";
 import { usePatio } from "../../../hooks/usePatio";
-import { useNavigation } from "@react-navigation/native";
+import { patioService } from '../../../services/patioService';
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { RootStackParamList } from '../../../types/navigation';
+
+type RegisterPatioRouteProp = RouteProp<RootStackParamList, 'RegisterPatio'>;
 
 export const useRegisterPatio = () => {
   const { user } = useAuth();
   const { registerPatio, checkPatioExists } = usePatio();
   const navigation = useNavigation();
+  const route = useRoute<RegisterPatioRouteProp>();
+  const editingPatioId = (route?.params as any)?.patioId as number | undefined;
   const [isPatioRegistered, setIsPatioRegistered] = useState(false);
   
   useEffect(() => {
@@ -17,20 +23,22 @@ export const useRegisterPatio = () => {
 
   const checkPatioAccess = async () => {
     try {
-      // Verifica se o usuário é admin
-      if (user?.role !== "ADMIN") {
-        Alert.alert("Acesso Negado", "Apenas administradores podem registrar um pátio.");
+      // Verifica se o usuário é admin ou master (master pode editar)
+      if (user?.role !== "ADMIN" && user?.role !== 'MASTER') {
+        Alert.alert("Acesso Negado", "Apenas administradores ou master podem acessar este recurso.");
         navigation.goBack();
         return;
       }
 
-      // Verifica se já existe um pátio registrado
-      const patioExists = await checkPatioExists();
-      if (patioExists) {
-        Alert.alert("Aviso", "Já existe um pátio registrado no sistema.");
-        setIsPatioRegistered(true);
-        navigation.goBack();
-        return;
+      // Se estivermos criando (não editando), verifica se já existe um pátio registrado
+      if (!editingPatioId) {
+        const patioExists = await checkPatioExists();
+        if (patioExists) {
+          Alert.alert("Aviso", "Já existe um pátio registrado no sistema.");
+          setIsPatioRegistered(true);
+          navigation.goBack();
+          return;
+        }
       }
     } catch (error) {
       console.error("Erro ao verificar acesso:", error);
@@ -50,6 +58,33 @@ export const useRegisterPatio = () => {
     imagemPlantaUrl: "",
   });
   const [loading, setLoading] = useState(false);
+
+  // se vier patioId por params, carregar e preencher para edição
+  useEffect(() => {
+    const loadPatio = async () => {
+      if (editingPatioId) {
+        try {
+          const patio = await patioService.getPatioById(editingPatioId);
+          if (patio) {
+            setFormData({
+              endereco: {
+                cep: String(patio.endereco?.cep || ''),
+                logradouro: patio.endereco?.logradouro || '',
+                numero: String(patio.endereco?.numero || ''),
+                cidade: patio.endereco?.cidade || '',
+                estado: patio.endereco?.estado || '',
+                bairro: patio.endereco?.bairro || '',
+              },
+              imagemPlantaUrl: patio.imagemPlantaUrl || ''
+            });
+          }
+        } catch (e) {
+          console.warn('Erro ao carregar pátio para edição', e);
+        }
+      }
+    };
+    loadPatio();
+  }, [editingPatioId]);
 
   const handleSubmit = async () => {
     try {
@@ -71,6 +106,20 @@ export const useRegisterPatio = () => {
         },
         imagemPlantaUrl: formData.imagemPlantaUrl,
       };
+
+      if (editingPatioId) {
+        // editar
+        try {
+          const updated = await patioService.updatePatioById(editingPatioId, data as any);
+          Alert.alert('Sucesso', 'Pátio atualizado com sucesso!');
+          navigation.goBack();
+          return;
+        } catch (e) {
+          console.warn('Erro ao atualizar pátio', e);
+          Alert.alert('Erro', 'Não foi possível atualizar o pátio');
+          return;
+        }
+      }
 
       await registerPatio(data);
       Alert.alert("Sucesso", "Pátio registrado com sucesso!");
