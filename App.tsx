@@ -12,7 +12,7 @@ export default function App() {
         <AuthProvider>
           <StatusBar
             barStyle="light-content"
-            backgroundColor={theme.colors.primary}
+            backgroundColor={theme.colors.background}
           />
           <AppNavigator />
         </AuthProvider>

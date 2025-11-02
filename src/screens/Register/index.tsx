@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image, ScrollVie
 import { useNavigation } from '@react-navigation/native';
 import { FormCard, styles } from './styles';
 import { useAuth } from '../../contexts/AuthContext';
-import { HeaderContainer } from '../../components/Header';
 import { useRegister } from './hook/useRegister';
 import { FormsDatas } from './components/FormsDatas';
 
@@ -17,7 +16,6 @@ export const RegisterScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <HeaderContainer/>
                 
             <ScrollView
                 style={styles.scrollView}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { View } from 'react-native';
-import Header from './Header';
 import styled from 'styled-components/native';
 
 interface ProtectedLayoutProps {
@@ -10,7 +9,6 @@ interface ProtectedLayoutProps {
 const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
   return (
     <Container>
-      <Header />
       <Content>
         {children}
       </Content>

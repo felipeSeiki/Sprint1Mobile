@@ -16,7 +16,8 @@ import { RegisterMotosScreen } from '../screens/RegisterMoto';
 import DashboardScreen from '../screens/DashBoard';
 import DashboardAdminScreen from '../screens/DashBoardAdmin';
 import { RegisterPatioScreen } from '../screens/RegisterPatio';
-import ProtectedLayout from '../components/ProtectedLayout';
+import { AppStackHeader } from '../components/Header';
+import theme from '../styles/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -30,27 +31,26 @@ export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
+            screenOptions={{
+          headerShown: true,
+          header: (props) => <AppStackHeader {...props} />,
+              headerStyle: { backgroundColor: '#000' },
+          headerTransparent: false,
         }}
       >
         {!user ? (
           // Rotas públicas
           <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
+            <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login', headerBackVisible: false }} />
+            <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registrar' }} />
           </>
         ) : (
           // Rotas protegidas
           <>
             <Stack.Screen
               name="Home"
-              component={(props: NativeStackScreenProps<RootStackParamList, 'Home'>) => (
-                <ProtectedLayout>
-                  <HomeScreen {...props} />
-                </ProtectedLayout>
-              )}
-              options={{ title: 'Início' }}
+              component={HomeScreen}
+              options={{ title: 'Início', headerBackVisible: false }}
             />
             <Stack.Screen
               name="RegisterMoto"
@@ -59,20 +59,12 @@ export const AppNavigator: React.FC = () => {
             />
             <Stack.Screen
               name="Dashboard"
-              component={(props: NativeStackScreenProps<RootStackParamList, 'Dashboard'>) => (
-                <ProtectedLayout>
-                  <DashboardScreen {...props} />
-                </ProtectedLayout>
-              )}
-              options={{ title: 'Dashboard' }}
+              component={DashboardScreen}
+              options={{ title: 'Dashboard', headerBackVisible: false }}
             />
             <Stack.Screen
               name="DashboardAdmin"
-              component={(props: NativeStackScreenProps<RootStackParamList, 'DashboardAdmin'>) => (
-                <ProtectedLayout>
-                  <DashboardAdminScreen {...props} />
-                </ProtectedLayout>
-              )}
+              component={DashboardAdminScreen}
               options={{ title: 'Dashboard Admin' }}
             />
             <Stack.Screen

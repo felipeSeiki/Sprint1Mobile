@@ -2,7 +2,6 @@ import React from 'react';
 import { Text, Image, TouchableOpacity } from 'react-native';
 import { useDashBoard } from './hook/useDashBoard';
 import { DashboardScreenProps } from './type/type';
-import { HeaderContainer } from '../../components/Header';
 import { ListMoto } from './components/ListMoto';
 import { SummaryMoto } from './components/SummaryMoto';
 import { ModalMoto } from './components/ModalMoto';

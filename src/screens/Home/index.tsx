@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Text, Modal, PanResponder, Animated, TouchableOpacity, Image } from 'react-native';
 import { HomeScreenProps } from './type/type';
 import { AddButton, AddButtonText, AnimatedCardContainer, BikeIcon, BikeSpot, BottomContainer, Card, CardContainer, Column, Container, EmptySpace, Row, styles } from './styles';
-import { HeaderContainer } from '../../components/Header';
 import { useAuth } from '../../contexts/AuthContext';
 import { useHome } from './hook/useHome';
 import { parkingSpots } from './models/parkSpotsMock';

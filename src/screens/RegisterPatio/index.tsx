@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { styles } from './styles';
 import { Input, Button } from 'react-native-elements';
-import { HeaderContainer } from '../../components/Header';
 import { Container } from '../Home/styles';
 import { useRegisterPatio } from './hook/useRegisterPatio';
 import { useAuth } from '../../contexts/AuthContext';
@@ -30,7 +29,6 @@ export const RegisterPatioScreen: React.FC = () => {
     if (loading) {
         return (
             <Container>
-                <HeaderContainer title="Registrar Pátio" />
                 <View style={[styles.form, { justifyContent: 'center' }]}>
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>
@@ -45,7 +43,6 @@ export const RegisterPatioScreen: React.FC = () => {
 
     return (
         <Container>
-            <HeaderContainer title="Registrar Pátio" />
             <View style={styles.form}>
                 <Input
                     placeholder="CEP"

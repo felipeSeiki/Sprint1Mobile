@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, SafeAreaView, Image } from 'react-native';
 import { useLogin } from './hooks/useLogin';
-import { HeaderContainer } from '../../components/Header';
 import { LoginInputs } from './components/LoginInputs';
 import { styles } from './styles';
 
@@ -15,7 +14,6 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderContainer/>
 
       <View style={styles.content}>
         <View style={styles.loginContainer}>
