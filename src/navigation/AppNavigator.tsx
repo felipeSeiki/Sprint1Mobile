@@ -18,7 +18,6 @@ import DashboardAdminScreen from '../screens/DashBoardAdmin';
 import { RegisterPatioScreen } from '../screens/RegisterPatio';
 import { EditUsersScreen } from '../screens/EditUsers';
 import { AppStackHeader } from '../components/Header';
-import theme from '../styles/theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

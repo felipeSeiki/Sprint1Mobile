@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_PATIO } from '../constants/patio';
 import { USE_MOCKS } from '../config/useMock';
 import { MOCK_PATIOS } from '../mocks/patios.mock';
+import { mockDb } from './mockDb';
 
 const STORAGE_KEYS = {
   PATIO: '@MottuApp:patio'
@@ -29,6 +30,10 @@ export const patioService = {
   // Verifica se existe um pátio registrado
   async checkPatioExists(): Promise<boolean> {
     try {
+      if (USE_MOCKS) {
+        // Em modo mock, permitimos múltiplos pátios
+        return false;
+      }
       const patioData = await AsyncStorage.getItem(STORAGE_KEYS.PATIO);
       return !!patioData;
     } catch (error) {
@@ -40,6 +45,10 @@ export const patioService = {
   // Obtém o pátio registrado
   async getPatio(): Promise<Patio | null> {
     try {
+      if (USE_MOCKS) {
+        const list = await mockDb.getPatios();
+        return list[0] || null;
+      }
       const patioData = await AsyncStorage.getItem(STORAGE_KEYS.PATIO);
       if (patioData) {
         return JSON.parse(patioData);
@@ -53,9 +62,9 @@ export const patioService = {
 
   // Lista todos os pátios (tenta backend, senão fallback para storage)
   async getAllPatios(): Promise<Patio[]> {
-    // Modo mock: retorna pátios pré-definidos
+    // Modo mock: retorna pátios persistidos no mockDb
     if (USE_MOCKS) {
-      return MOCK_PATIOS;
+      return await mockDb.getPatios();
     }
 
     try {
@@ -81,6 +90,10 @@ export const patioService = {
 
   // Deleta um pátio por id (tenta backend, senão fallback para storage)
   async deletePatioById(id: number): Promise<void> {
+    if (USE_MOCKS) {
+      await mockDb.deletePatio(id);
+      return;
+    }
     try {
       await api.delete(`/api/patio/${id}`);
       // se sucesso, remover local se igual
@@ -102,6 +115,14 @@ export const patioService = {
 
   // Registra um novo pátio
   async createPatio(data: CreatePatioDTO): Promise<Patio> {
+    // Modo mock: adicionar a lista persistida
+    if (USE_MOCKS) {
+      const created = await mockDb.addPatio({
+        endereco: data.endereco,
+        imagemPlantaUrl: data.imagemPlantaUrl || 'https://example.com/default-planta.png',
+      } as any);
+      return created;
+    }
     try {
       const exists = await this.checkPatioExists();
       if (exists) {
@@ -123,6 +144,9 @@ export const patioService = {
 
   // Atualiza um pátio existente
   async updatePatio(id: number, data: Partial<CreatePatioDTO>): Promise<Patio> {
+    if (USE_MOCKS) {
+      return await mockDb.updatePatio(id, data as any);
+    }
     try {
       const currentPatio = await this.getPatio();
       if (!currentPatio) {
@@ -144,6 +168,9 @@ export const patioService = {
 
   // Atualiza um pátio por id (tenta backend, senão fallback)
   async updatePatioById(id: number, data: Partial<CreatePatioDTO>): Promise<Patio> {
+    if (USE_MOCKS) {
+      return await mockDb.updatePatio(id, data as any);
+    }
     try {
       const response = await api.put(`/api/patio/${id}`, data);
       const updated = response.data;
@@ -161,9 +188,9 @@ export const patioService = {
 
   // Obtém pátio por id (tenta backend, senão fallback)
   async getPatioById(id: number): Promise<Patio | null> {
-    // Modo mock: retorna pátio dos mocks
+    // Modo mock: retorna pátio do mockDb
     if (USE_MOCKS) {
-      return MOCK_PATIOS.find(p => p.id === id) || null;
+      return await mockDb.getPatioById(id);
     }
 
     try {
@@ -178,6 +205,10 @@ export const patioService = {
 
   // Deleta um pátio
   async deletePatio(id: number): Promise<void> {
+    if (USE_MOCKS) {
+      await mockDb.deletePatio(id);
+      return;
+    }
     try {
       await AsyncStorage.removeItem(STORAGE_KEYS.PATIO);
     } catch (error) {

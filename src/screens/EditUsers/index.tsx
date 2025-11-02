@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ScrollView, View, RefreshControl, Modal, Alert } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation';
-import { MOCK_USERS } from '../../mocks/users.mock';
-import { MOCK_PATIOS } from '../../mocks/patios.mock';
+import { usersService } from '../../services/usersService';
+import { patioService } from '../../services/patioService';
 import { Users } from '../../types/auth';
 import { Input, Button } from 'react-native-elements';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Container,
   Content,
@@ -30,6 +31,7 @@ type EditUsersRouteProp = RouteProp<RootStackParamList, 'EditUsers'>;
 export const EditUsersScreen: React.FC = () => {
   const route = useRoute<EditUsersRouteProp>();
   const navigation = useNavigation();
+  const { user } = useAuth();
   const { patioId } = route.params;
   const [users, setUsers] = useState<Users[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -40,15 +42,30 @@ export const EditUsersScreen: React.FC = () => {
     password: '',
   });
 
-  const patio = MOCK_PATIOS.find(p => p.id === patioId);
+  const [patioTitle, setPatioTitle] = useState<string>('');
 
-  const loadUsers = () => {
-    const patioUsers = MOCK_USERS.filter(u => (u as any).patioId === patioId);
+  // Verificação de acesso - apenas MASTER pode editar usuários
+  useEffect(() => {
+    if (user?.role !== 'MASTER') {
+      Alert.alert(
+        'Acesso Negado',
+        'Apenas o Master pode gerenciar usuários dos pátios.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }]
+      );
+    }
+  }, [user, navigation]);
+
+  const loadUsers = async () => {
+    const patioUsers = await usersService.listByPatio(patioId);
     setUsers(patioUsers);
   };
 
   useEffect(() => {
-    loadUsers();
+    (async () => {
+      await loadUsers();
+      const patio = await patioService.getPatioById(patioId);
+      if (patio) setPatioTitle(`${patio.endereco.cidade}/${patio.endereco.estado}`);
+    })();
   }, [patioId]);
 
   const onRefresh = () => {
@@ -76,8 +93,11 @@ export const EditUsersScreen: React.FC = () => {
           text: 'Excluir',
           style: 'destructive',
           onPress: () => {
-            setUsers(prev => prev.filter(u => u.id !== userId));
-            Alert.alert('Sucesso', 'Usuário excluído (mock)');
+            (async () => {
+              await usersService.remove(userId);
+              await loadUsers();
+              Alert.alert('Sucesso', 'Usuário excluído');
+            })();
           },
         },
       ]
@@ -87,15 +107,12 @@ export const EditUsersScreen: React.FC = () => {
   const handleSaveUser = () => {
     if (!editingUser) return;
 
-    setUsers(prev =>
-      prev.map(u =>
-        u.id === editingUser.id
-          ? { ...u, user: formData.user, password: formData.password }
-          : u
-      )
-    );
-    setShowModal(false);
-    Alert.alert('Sucesso', 'Usuário atualizado (mock)');
+    (async () => {
+      await usersService.update(editingUser.id!, { user: formData.user, password: formData.password });
+      await loadUsers();
+      setShowModal(false);
+      Alert.alert('Sucesso', 'Usuário atualizado');
+    })();
   };
 
   const handleCloseModal = () => {
@@ -104,11 +121,16 @@ export const EditUsersScreen: React.FC = () => {
     setFormData({ user: '', password: '' });
   };
 
+  // Bloquear renderização se não for MASTER
+  if (user?.role !== 'MASTER') {
+    return null;
+  }
+
   return (
     <Container>
       <Content>
         <Title>
-          Usuários do Pátio: {patio?.endereco.cidade}/{patio?.endereco.estado}
+          Usuários do Pátio: {patioTitle}
         </Title>
 
         <TableContainer>

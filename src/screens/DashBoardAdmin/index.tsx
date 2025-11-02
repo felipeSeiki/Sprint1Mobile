@@ -18,6 +18,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     deletePatio,
   } = useDashBoard();
 
+  const handleAddPatio = () => {
+    console.log('Navegando para RegisterPatio...');
+    try {
+      navigation.navigate('RegisterPatio', undefined);
+    } catch (error) {
+      console.error('Erro ao navegar:', error);
+    }
+  };
+
   return (
     <Container>
       <Content>
@@ -30,7 +39,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             </FilterButton>
           </FilterContainer>
 
-          <AddButton onPress={() => navigation.navigate('RegisterPatio' as any)}>
+          <AddButton onPress={handleAddPatio}>
             <AddButtonText>+ ADD PÁTIO</AddButtonText>
           </AddButton>
           <AddButton onPress={onRefresh}>

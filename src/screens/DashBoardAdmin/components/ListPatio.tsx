@@ -21,6 +21,24 @@ interface ListProps {
 export const ListPatio: React.FC<ListProps> = ({ showModal, setShowModal, patios, selectedPatio, handlePatioPress, deletePatio, refreshing = false, onRefresh }) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+    const handleEditUsers = (patioId: number) => {
+        console.log('Navegando para EditUsers com patioId:', patioId);
+        try {
+            navigation.navigate('EditUsers', { patioId });
+        } catch (error) {
+            console.error('Erro ao navegar para EditUsers:', error);
+        }
+    };
+
+    const handleEditPatio = (patio: Patio) => {
+        console.log('Navegando para RegisterPatio com patio:', patio);
+        try {
+            navigation.navigate('RegisterPatio', { patio });
+        } catch (error) {
+            console.error('Erro ao navegar para RegisterPatio:', error);
+        }
+    };
+
     return (
         <MotoList>
             <ListHeader>
@@ -53,7 +71,7 @@ export const ListPatio: React.FC<ListProps> = ({ showModal, setShowModal, patios
                             <List.Item
                                 title="Editar Usuários"
                                 description="Gerenciar usuários deste pátio"
-                                onPress={() => navigation.navigate('EditUsers' as any, { patioId: patio.id })}
+                                onPress={() => handleEditUsers(patio.id)}
                                 left={() => <List.Icon icon="account-edit" color="#00CF3A" />}
                                 titleStyle={{ color: '#FFFFFF' }}
                                 descriptionStyle={{ color: '#AAAAAA', fontSize: 11 }}
@@ -62,7 +80,7 @@ export const ListPatio: React.FC<ListProps> = ({ showModal, setShowModal, patios
                             <List.Item
                                 title="Editar Pátio"
                                 description="Atualizar dados do pátio"
-                                onPress={() => navigation.navigate('RegisterPatio' as any, { patio })}
+                                onPress={() => handleEditPatio(patio)}
                                 left={() => <List.Icon icon="pencil" color="#00CF3A" />}
                                 titleStyle={{ color: '#FFFFFF' }}
                                 descriptionStyle={{ color: '#AAAAAA', fontSize: 11 }}

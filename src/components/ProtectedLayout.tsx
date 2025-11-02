@@ -18,7 +18,7 @@ const ProtectedLayout: React.FC<ProtectedLayoutProps> = ({ children }) => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #fff;
+  background-color: #1A1A1A;
 `;
 
 const Content = styled.View`

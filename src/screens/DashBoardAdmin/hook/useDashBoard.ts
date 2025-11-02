@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Patio, RootStackParamList } from "../../../types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { patioService } from "../../../services/patioService";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const useDashBoard = () => {
   const { signOut, user } = useAuth();
@@ -36,6 +37,13 @@ export const useDashBoard = () => {
     })();
     return () => { isMounted = false; };
   }, []);
+
+  // Recarrega quando a tela volta ao foco (após edição/criação)
+  useFocusEffect(
+    useCallback(() => {
+      loadPatios();
+    }, [user])
+  );
 
   const onRefresh = async () => {
     setRefreshing(true);

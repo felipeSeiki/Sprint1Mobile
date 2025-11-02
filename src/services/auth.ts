@@ -4,6 +4,7 @@ import { Moto } from '../types/motos';
 import { api } from '../config/api';
 import { USE_MOCKS } from '../config/useMock';
 import { MOCK_USERS } from '../mocks/users.mock';
+import { mockDb } from './mockDb';
 import { MOCK_MOTOS } from '../mocks/motos.mock';
 import { MOCK_PATIOS } from '../mocks/patios.mock';
 
@@ -61,19 +62,20 @@ export const authService = {
     try {
       // Modo mock: retorna usuários pré-definidos sem chamada à API
       if (USE_MOCKS) {
-        // Busca o usuário nos mocks
-        const mockUser = MOCK_USERS.find(
-          u => u.user === credentials.login && u.password === credentials.password
+        // Busca o usuário no mockDb persistido (reflete edições feitas no app)
+        const users = await mockDb.getUsers();
+        const found = users.find(
+          (u: any) => u.user === credentials.login && u.password === credentials.password
         );
 
-        if (!mockUser) {
+        if (!found) {
           throw new Error('Usuário ou senha inválidos');
         }
 
-        const token = btoa(JSON.stringify({ mock: true, role: mockUser.role, ts: Date.now() }));
-        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUser));
+        const token = btoa(JSON.stringify({ mock: true, role: found.role, ts: Date.now() }));
+        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(found));
         await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
-        return { user: mockUser, token } as AuthResponse;
+        return { user: found as Users, token } as AuthResponse;
       }
       // Call backend login endpoint (expects { login, password })
   const payload = { login: credentials.login, password: credentials.password };

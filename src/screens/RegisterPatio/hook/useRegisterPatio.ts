@@ -24,23 +24,25 @@ export const useRegisterPatio = () => {
 
   const checkPatioAccess = async () => {
     try {
-      // Verifica se o usuário é admin ou master (master pode editar)
-      if (user?.role !== "ADMIN" && user?.role !== 'MASTER') {
-        Alert.alert("Acesso Negado", "Apenas administradores ou master podem acessar este recurso.");
+      console.log('checkPatioAccess - user role:', user?.role, 'editingPatioId:', editingPatioId);
+      
+      // Apenas MASTER pode acessar
+      if (user?.role !== 'MASTER') {
+        console.log('Acesso negado - apenas MASTER');
+        Alert.alert("Acesso Negado", "Apenas o Master pode gerenciar pátios.");
         navigation.goBack();
         return;
       }
 
-      // Se estivermos criando (não editando), verifica se já existe um pátio registrado
-      if (!editingPatioId) {
-        const patioExists = await checkPatioExists();
-        if (patioExists) {
-          Alert.alert("Aviso", "Já existe um pátio registrado no sistema.");
-          setIsPatioRegistered(true);
-          navigation.goBack();
-          return;
-        }
+      // Se estiver editando, permite acesso sem verificar se já existe pátio
+      if (editingPatioId) {
+        console.log('Modo edição - permitindo acesso');
+        return;
       }
+
+      // Se estivermos criando (não editando), permite criar novo pátio
+      // (removida verificação de pátio existente para permitir múltiplos pátios nos mocks)
+      console.log('Modo criação - permitindo acesso');
     } catch (error) {
       console.error("Erro ao verificar acesso:", error);
       Alert.alert("Erro", "Erro ao verificar permissões de acesso.");
@@ -112,8 +114,9 @@ export const useRegisterPatio = () => {
         }
       }
 
-      await registerPatio(data);
-      Alert.alert("Sucesso", "Pátio registrado com sucesso!");
+  await registerPatio(data);
+  Alert.alert("Sucesso", "Pátio registrado com sucesso!");
+  navigation.goBack();
     } catch (error) {
       Alert.alert("Erro", "Erro ao registrar o pátio. Tente novamente.");
     } finally {
