@@ -15,6 +15,10 @@ export interface BaseUser {
   user: string;
   role: UserRole;
   password: string;
+  /**
+   * ID do pátio ao qual o usuário pertence (aplicável a USER/ADMIN)
+   */
+  patioId?: number;
 }
 
 /**

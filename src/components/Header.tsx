@@ -36,14 +36,6 @@ export const AppStackHeader: React.FC<NativeStackHeaderProps> = ({ route, naviga
   const isDashboard = route?.name === 'Dashboard';
   const isMaster = user?.role === 'MASTER';
   const canNavigateHome = user && !isLogin && !isHome && isMaster && !isDashboard;
-  
-  // Debug: remova após verificar
-  console.log('Header Debug:', { 
-    routeName: route?.name, 
-    userRole: user?.role, 
-    isMaster, 
-    canNavigateHome 
-  });
 
   return (
     <StyledHeaderContainer showLogo>

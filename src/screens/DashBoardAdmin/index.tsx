@@ -12,6 +12,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     setShowModal,
     selectedPatio,
     patios,
+    refreshing,
+    onRefresh,
     handlePatioPress,
     deletePatio,
   } = useDashBoard();
@@ -28,8 +30,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             </FilterButton>
           </FilterContainer>
 
-          <AddButton onPress={() => navigation.navigate('RegisterMoto')}>
-            <AddButtonText>+ ADD MOTO</AddButtonText>
+          <AddButton onPress={() => navigation.navigate('RegisterPatio' as any)}>
+            <AddButtonText>+ ADD PÁTIO</AddButtonText>
+          </AddButton>
+          <AddButton onPress={onRefresh}>
+            <AddButtonText>↻ RESETAR LISTA</AddButtonText>
           </AddButton>
         </ActionBar>
 
@@ -40,6 +45,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
           setShowModal={setShowModal}
           selectedPatio={selectedPatio ? selectedPatio.id : 0}
           deletePatio={deletePatio}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
         />
 
       </Content>

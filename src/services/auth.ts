@@ -3,6 +3,9 @@ import { Admin, AuthResponse, LoginCredentials, RegisterData, RegisterDataPatio,
 import { Moto } from '../types/motos';
 import { api } from '../config/api';
 import { USE_MOCKS } from '../config/useMock';
+import { MOCK_USERS } from '../mocks/users.mock';
+import { MOCK_MOTOS } from '../mocks/motos.mock';
+import { MOCK_PATIOS } from '../mocks/patios.mock';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -13,36 +16,8 @@ const STORAGE_KEYS = {
   MOTOS: '@MottuApp:motos',
 };
 
-// Motos mockadas para teste
-const mockMotos = [
-  {
-    id: '1',
-    modelo: 'Honda CB 500',
-    placa: 'ABC-1234',
-    cod_tag: 'TAG001',
-    status: 'Disponível',
-    posicaoX: '2',
-    posicaoY: '0',
-  },
-  {
-    id: '2',
-    modelo: 'Yamaha MT-07',
-    placa: 'DEF-5678',
-    cod_tag: 'TAG002',
-    status: 'Manutenção',
-    posicaoX: '3',
-    posicaoY: '1',
-  },
-  {
-    id: '3',
-    modelo: 'Kawasaki Ninja 400',
-    placa: 'GHI-9012',
-    cod_tag: 'TAG003',
-    status: 'Reservada',
-    posicaoX: '4',
-    posicaoY: '2',
-  },
-];
+// Referência para os mocks importados
+const mockMotos = MOCK_MOTOS;
 
 // Pátio padrão mockado
 const mockPatio = {
@@ -86,24 +61,19 @@ export const authService = {
     try {
       // Modo mock: retorna usuários pré-definidos sem chamada à API
       if (USE_MOCKS) {
-        const uname = String(credentials.login).toLowerCase();
-        let role: UserRole = 'USER';
-        if (uname.includes('master')) role = 'MASTER';
-        else if (uname.includes('admin')) role = 'ADMIN';
+        // Busca o usuário nos mocks
+        const mockUser = MOCK_USERS.find(
+          u => u.user === credentials.login && u.password === credentials.password
+        );
 
-        const mockUserLocal: any = {
-          id: `${role.toLowerCase()}_id`,
-          user: credentials.login,
-          role,
-          password: credentials.password,
-          name: `${role} Mock`,
-          email: `${credentials.login}@mock.local`
-        };
+        if (!mockUser) {
+          throw new Error('Usuário ou senha inválidos');
+        }
 
-        const token = btoa(JSON.stringify({ mock: true, role, ts: Date.now() }));
-        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUserLocal));
+        const token = btoa(JSON.stringify({ mock: true, role: mockUser.role, ts: Date.now() }));
+        await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUser));
         await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, token);
-        return { user: mockUserLocal, token } as AuthResponse;
+        return { user: mockUser, token } as AuthResponse;
       }
       // Call backend login endpoint (expects { login, password })
   const payload = { login: credentials.login, password: credentials.password };

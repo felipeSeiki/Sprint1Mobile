@@ -2,6 +2,8 @@ import { api } from '../config/api';
 import { Patio } from '../types/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DEFAULT_PATIO } from '../constants/patio';
+import { USE_MOCKS } from '../config/useMock';
+import { MOCK_PATIOS } from '../mocks/patios.mock';
 
 const STORAGE_KEYS = {
   PATIO: '@MottuApp:patio'
@@ -51,6 +53,11 @@ export const patioService = {
 
   // Lista todos os pátios (tenta backend, senão fallback para storage)
   async getAllPatios(): Promise<Patio[]> {
+    // Modo mock: retorna pátios pré-definidos
+    if (USE_MOCKS) {
+      return MOCK_PATIOS;
+    }
+
     try {
       // tentar backend
       const response = await api.get('/api/patio');
@@ -154,6 +161,11 @@ export const patioService = {
 
   // Obtém pátio por id (tenta backend, senão fallback)
   async getPatioById(id: number): Promise<Patio | null> {
+    // Modo mock: retorna pátio dos mocks
+    if (USE_MOCKS) {
+      return MOCK_PATIOS.find(p => p.id === id) || null;
+    }
+
     try {
       const response = await api.get(`/api/patio/${id}`);
       return response.data;
