@@ -14,7 +14,8 @@ export const useRegisterPatio = () => {
   const { registerPatio, checkPatioExists } = usePatio();
   const navigation = useNavigation();
   const route = useRoute<RegisterPatioRouteProp>();
-  const editingPatioId = (route?.params as any)?.patioId as number | undefined;
+  const editingPatio = (route?.params as any)?.patio;
+  const editingPatioId = editingPatio?.id;
   const [isPatioRegistered, setIsPatioRegistered] = useState(false);
   
   useEffect(() => {
@@ -59,32 +60,22 @@ export const useRegisterPatio = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  // se vier patioId por params, carregar e preencher para edição
+  // se vier patio por params, preencher para edição
   useEffect(() => {
-    const loadPatio = async () => {
-      if (editingPatioId) {
-        try {
-          const patio = await patioService.getPatioById(editingPatioId);
-          if (patio) {
-            setFormData({
-              endereco: {
-                cep: String(patio.endereco?.cep || ''),
-                logradouro: patio.endereco?.logradouro || '',
-                numero: String(patio.endereco?.numero || ''),
-                cidade: patio.endereco?.cidade || '',
-                estado: patio.endereco?.estado || '',
-                bairro: patio.endereco?.bairro || '',
-              },
-              imagemPlantaUrl: patio.imagemPlantaUrl || ''
-            });
-          }
-        } catch (e) {
-          console.warn('Erro ao carregar pátio para edição', e);
-        }
-      }
-    };
-    loadPatio();
-  }, [editingPatioId]);
+    if (editingPatio) {
+      setFormData({
+        endereco: {
+          cep: String(editingPatio.endereco?.cep || ''),
+          logradouro: editingPatio.endereco?.logradouro || '',
+          numero: String(editingPatio.endereco?.numero || ''),
+          cidade: editingPatio.endereco?.cidade || '',
+          estado: editingPatio.endereco?.estado || '',
+          bairro: editingPatio.endereco?.bairro || '',
+        },
+        imagemPlantaUrl: editingPatio.imagemPlantaUrl || ''
+      });
+    }
+  }, [editingPatio]);
 
   const handleSubmit = async () => {
     try {

@@ -109,9 +109,8 @@ export const RegisterPatioScreen: React.FC = () => {
                 <Button
                     onPress={handleSubmit}
                     disabled={loading}
-                >
-                    {loading ? 'Registrando...' : 'Registrar Pátio'}
-                </Button>
+                    title={loading ? 'Salvando...' : (formData.endereco.cep ? 'Atualizar Pátio' : 'Registrar Pátio')}
+                />
             </View>
         </Container>
     );

@@ -16,6 +16,7 @@ import { RegisterMotosScreen } from '../screens/RegisterMoto';
 import DashboardScreen from '../screens/DashBoard';
 import DashboardAdminScreen from '../screens/DashBoardAdmin';
 import { RegisterPatioScreen } from '../screens/RegisterPatio';
+import { EditUsersScreen } from '../screens/EditUsers';
 import { AppStackHeader } from '../components/Header';
 import theme from '../styles/theme';
 
@@ -71,6 +72,11 @@ export const AppNavigator: React.FC = () => {
               name="RegisterPatio"
               component={RegisterPatioScreen}
               options={{ title: 'Registrar Pátio' }}
+            />
+            <Stack.Screen
+              name="EditUsers"
+              component={EditUsersScreen}
+              options={{ title: 'Editar Usuários' }}
             />
           </>
         )}

@@ -1,8 +1,11 @@
 import { RefreshControl, ScrollView, View } from "react-native";
-import { HeaderText, ListHeader, MotoItem, MotoList, MotoText } from "../styles";
+import { HeaderText, ListHeader, MotoList, MotoText } from "../styles";
 import { Patio } from "../../../types/patios";
-import { IconButton } from "react-native-paper";
+import { List } from "react-native-paper";
 import { ModalDeletePatio } from "./ModalDeletePatio";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../types";
 
 interface ListProps {
     showModal: boolean;
@@ -16,38 +19,67 @@ interface ListProps {
 }
 
 export const ListPatio: React.FC<ListProps> = ({ showModal, setShowModal, patios, selectedPatio, handlePatioPress, deletePatio, refreshing = false, onRefresh }) => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
     return (
         <MotoList>
             <ListHeader>
-                <HeaderText>Patio</HeaderText>
-                <HeaderText>Local</HeaderText>
-                <HeaderText>Ações</HeaderText>
+                <HeaderText style={{ textAlign: 'center', fontSize: 18 }}>Pátios</HeaderText>
             </ListHeader>
 
-                        <ScrollView refreshControl={
+            <ScrollView refreshControl={
                 <RefreshControl refreshing={!!refreshing} onRefresh={onRefresh} tintColor="#00CF3A" />
             }>
-                                {patios.length === 0 ? (
-                                    <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
-                                        <MotoText>Nenhum pátio encontrado</MotoText>
-                                        {onRefresh && (
-                                            <View style={{ marginTop: 12 }}>
-                                                <IconButton icon="refresh" mode="contained-tonal" onPress={onRefresh} iconColor="#00CF3A" />
-                                            </View>
-                                        )}
-                                    </View>
-                                ) : (
-                                patios.map((patio, idx) => (
-                                        <MotoItem key={patio.id} style={{ backgroundColor: idx % 2 === 0 ? '#262626' : '#2A2A2A' }}>
-                        <MotoText>{patio.id}</MotoText>
-                        <MotoText>{patio.endereco.cidade} - {patio.endereco.estado}</MotoText>
-                        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                          <IconButton icon="account-edit" size={20} iconColor="#FFFFFF" onPress={() => handlePatioPress(patio)} />
-                                                    <IconButton icon="pencil" size={20} iconColor="#FFFFFF" onPress={() => handlePatioPress(patio)} />
-                                                    <IconButton icon="delete" size={20} iconColor="#FF4D4F" onPress={() => handlePatioPress(patio)} />
-                        </View>
-                    </MotoItem>
-                                )))}
+                {patios.length === 0 ? (
+                    <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center' }}>
+                        <MotoText>Nenhum pátio encontrado</MotoText>
+                        {onRefresh && (
+                            <View style={{ marginTop: 12 }}>
+                                <List.Icon icon="refresh" color="#00CF3A" />
+                            </View>
+                        )}
+                    </View>
+                ) : (
+                patios.map((patio, idx) => (
+                    <View key={patio.id} style={{ backgroundColor: idx % 2 === 0 ? '#262626' : '#2A2A2A' }}>
+                        <List.Accordion
+                            title={`${patio.endereco.logradouro}, ${patio.endereco.numero} - ${patio.endereco.cidade}/${patio.endereco.estado}`}
+                            description={`ID: ${patio.id} | ${patio.endereco.bairro} | CEP: ${patio.endereco.cep}`}
+                            titleStyle={{ color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 }}
+                            descriptionStyle={{ color: '#CCCCCC', fontSize: 12 }}
+                            style={{ backgroundColor: idx % 2 === 0 ? '#262626' : '#2A2A2A', borderBottomWidth: 1, borderBottomColor: '#00CF3A' }}
+                            theme={{ colors: { primary: '#00CF3A' } }}
+                        >
+                            <List.Item
+                                title="Editar Usuários"
+                                description="Gerenciar usuários deste pátio"
+                                onPress={() => navigation.navigate('EditUsers' as any, { patioId: patio.id })}
+                                left={() => <List.Icon icon="account-edit" color="#00CF3A" />}
+                                titleStyle={{ color: '#FFFFFF' }}
+                                descriptionStyle={{ color: '#AAAAAA', fontSize: 11 }}
+                                style={{ backgroundColor: '#1E1E1E', paddingLeft: 16 }}
+                            />
+                            <List.Item
+                                title="Editar Pátio"
+                                description="Atualizar dados do pátio"
+                                onPress={() => navigation.navigate('RegisterPatio' as any, { patio })}
+                                left={() => <List.Icon icon="pencil" color="#00CF3A" />}
+                                titleStyle={{ color: '#FFFFFF' }}
+                                descriptionStyle={{ color: '#AAAAAA', fontSize: 11 }}
+                                style={{ backgroundColor: '#1E1E1E', paddingLeft: 16 }}
+                            />
+                            <List.Item
+                                title="Excluir Pátio"
+                                description="Remover este pátio permanentemente"
+                                onPress={() => handlePatioPress(patio)}
+                                left={() => <List.Icon icon="delete" color="#FF4D4F" />}
+                                titleStyle={{ color: '#FF4D4F' }}
+                                descriptionStyle={{ color: '#AAAAAA', fontSize: 11 }}
+                                style={{ backgroundColor: '#1E1E1E', paddingLeft: 16 }}
+                            />
+                        </List.Accordion>
+                    </View>
+                )))}
             </ScrollView>
 
             <ModalDeletePatio

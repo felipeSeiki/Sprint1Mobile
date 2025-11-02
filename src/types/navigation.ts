@@ -20,7 +20,8 @@ export type RootStackParamList = {
   Register: undefined;
   Home: undefined;
   RegisterMoto: undefined;
-  RegisterPatio: undefined;
+  RegisterPatio: { patio?: any } | undefined;
   Dashboard: undefined;
   DashboardAdmin: undefined;
+  EditUsers: { patioId: number };
 }; 
