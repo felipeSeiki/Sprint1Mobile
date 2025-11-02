@@ -64,7 +64,7 @@ const TimeCard = styled(TouchableOpacity) <StyledProps>`
   border-radius: 6px;
   background-color: ${(props: StyledProps) => props.isSelected ? theme.colors.primary + '20' : theme.colors.background};
   border-width: 1px;
-  border-color: ${(props: StyledProps) => props.isSelected ? theme.colors.primary : theme.colors.border};
+  border-color: ${(props: StyledProps) => props.isSelected ? theme.colors.primary : theme.colors.text};
   align-items: center;
   justify-content: center;
 `;

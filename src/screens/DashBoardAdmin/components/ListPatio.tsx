@@ -1,4 +1,4 @@
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView } from "react-native";
 import { HeaderText, ListHeader, MotoItem, MotoList, MotoText } from "../styles";
 import { Patio } from "../../../types/patios";
 import { List } from "react-native-paper";

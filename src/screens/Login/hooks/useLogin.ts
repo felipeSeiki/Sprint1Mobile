@@ -12,7 +12,7 @@ export const useLogin = () => {
 
   const handleLogin = async () => {
     try {
-      await signIn({ user, password });
+  await signIn({ login: user, password });
     } catch (error) {
       alert("Usuário ou senha inválidos");
     }

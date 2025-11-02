@@ -22,5 +22,5 @@ export type RootStackParamList = {
   RegisterMoto: undefined;
   RegisterPatio: undefined;
   Dashboard: undefined;
-  AdminDashboard: undefined;
+  DashboardAdmin: undefined;
 }; 

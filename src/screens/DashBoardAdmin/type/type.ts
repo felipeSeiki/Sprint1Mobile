@@ -1,6 +1,4 @@
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../types";
 
-export type DashboardScreenProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Dashboard'>;
-};
+export type DashboardScreenProps = NativeStackScreenProps<RootStackParamList, 'DashboardAdmin'>;

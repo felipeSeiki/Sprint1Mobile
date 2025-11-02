@@ -78,7 +78,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     <AddButtonText>DashBoard</AddButtonText>
                 </AddButton>
                 {user && (user.role === 'MASTER') ? (
-                  <AddButton onPress={() => navigation.navigate('AdminDashboard')}>
+                  <AddButton onPress={() => navigation.navigate('DashboardAdmin')}>
                     <AddButtonText>Admin</AddButtonText>
                   </AddButton>
                 ) : null}

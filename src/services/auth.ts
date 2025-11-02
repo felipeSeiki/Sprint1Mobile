@@ -86,18 +86,18 @@ export const authService = {
     try {
       // Modo mock: retorna usuários pré-definidos sem chamada à API
       if (USE_MOCKS) {
-        const uname = String(credentials.user).toLowerCase();
+        const uname = String(credentials.login).toLowerCase();
         let role: UserRole = 'USER';
         if (uname.includes('master')) role = 'MASTER';
         else if (uname.includes('admin')) role = 'ADMIN';
 
         const mockUserLocal: any = {
           id: `${role.toLowerCase()}_id`,
-          user: credentials.user,
+          user: credentials.login,
           role,
           password: credentials.password,
           name: `${role} Mock`,
-          email: `${credentials.user}@mock.local`
+          email: `${credentials.login}@mock.local`
         };
 
         const token = btoa(JSON.stringify({ mock: true, role, ts: Date.now() }));
@@ -106,7 +106,7 @@ export const authService = {
         return { user: mockUserLocal, token } as AuthResponse;
       }
       // Call backend login endpoint (expects { login, password })
-      const payload = { login: credentials.user, password: credentials.password };
+  const payload = { login: credentials.login, password: credentials.password };
       const response = await api.post('/auth/login', payload);
       const data = response.data || {};
 
@@ -127,7 +127,7 @@ export const authService = {
         }
       }
 
-      const finalToken = token ?? btoa(JSON.stringify({ userId: (user && (user.id || user.login)) || credentials.user, timestamp: Date.now() }));
+  const finalToken = token ?? btoa(JSON.stringify({ userId: (user && (user.id || user.login)) || credentials.login, timestamp: Date.now() }));
 
       // save token and user if present
       if (user) {
