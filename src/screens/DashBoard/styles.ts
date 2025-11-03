@@ -145,6 +145,15 @@ export const FilterText = styled.Text`
   color: #ffffff;
 `;
 
+export const SearchInput = styled.TextInput`
+  min-width: 130px;
+  padding: 10px 12px;
+  background-color: #2a2a2a;
+  border: 1px solid #00cf3a;
+  border-radius: 8px;
+  color: #ffffff;
+`;
+
 export const AddButton = styled.TouchableOpacity`
   background-color: #00cf3a;
   padding: 10px 20px;
