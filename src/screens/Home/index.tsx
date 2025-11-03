@@ -5,6 +5,7 @@ import { AddButton, AddButtonText, AnimatedCardContainer, BikeIcon, BikeSpot, Bo
 import { useAuth } from '../../contexts/AuthContext';
 import { useHome } from './hook/useHome';
 // Render agora usa layout por pátio em vez de parkingSpots fixo
+import { ModalMoto } from '../DashBoard/components/ModalMoto';
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
@@ -20,6 +21,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         layout,
         layoutCapacity,
         occupancy,
+        selectedMoto,
+        showModal,
+        setShowModal,
     } = useHome();
 
     const { user } = useAuth();
@@ -164,6 +168,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </AddButton>
                 ) : null}
             </BottomContainer>
+
+            {/* Modal de detalhes da moto (mesmo do Dashboard) */}
+            <ModalMoto
+              showModal={showModal}
+              setShowModal={setShowModal}
+              selectedMoto={selectedMoto}
+            />
         </Container>
     );
 };
