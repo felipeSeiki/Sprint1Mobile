@@ -33,7 +33,7 @@ export const AppStackHeader: React.FC<NativeStackHeaderProps> = ({ route, naviga
   const displayName = (user && (user.user || (user as any).login || (user as any).name || (user as any).email)) || '';
   const isLogin = route?.name === 'Login';
   const isHome = route?.name === 'Home';
-  const isDashboard = route?.name === 'Dashboard';
+  const isDashboard = (route?.name === 'Dashboard' && user?.role !== 'MASTER');
   const isMaster = user?.role === 'MASTER';
   const canNavigateHome = user && !isLogin && !isHome && isMaster && !isDashboard;
 

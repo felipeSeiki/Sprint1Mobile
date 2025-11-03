@@ -280,13 +280,15 @@ export const motoService = {
 
   async getAllMotos(): Promise<Moto[]> {
     try {
-      const motosJson = await AsyncStorage.getItem(STORAGE_KEYS.MOTOS);
-      if (motosJson) {
-        return JSON.parse(motosJson);
+      // Use fonte única via mockDb para evitar divergência de chaves/formatos
+      await mockDb.init();
+      const motos = await mockDb.getMotos();
+      // Se por algum motivo vier vazio, re-seed com mocks atuais
+      if (!motos || motos.length === 0) {
+        await mockDb.setMotos(mockMotos);
+        return mockMotos;
       }
-      // If no motos stored, use mock data
-      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(mockMotos));
-      return mockMotos;
+      return motos;
     } catch (error) {
       console.error('Erro ao carregar motos:', error);
       return mockMotos;
@@ -295,15 +297,15 @@ export const motoService = {
 
   async addMoto(newMoto: Omit<Moto, 'id'>): Promise<Moto> {
     try {
-      const motos = await this.getAllMotos();
-      const moto = {
+      const list = await this.getAllMotos();
+      const moto: Moto = {
         ...newMoto,
-        id: String(motos.length + 1)
+        id: String((list.reduce((m, x) => Math.max(m, Number(x.id) || 0), 0) || 0) + 1),
       };
-      
-      motos.push(moto);
-      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(motos));
-      
+      const updated = [...list, moto];
+      await mockDb.setMotos(updated);
+      // notifica inscritos
+      this.subscribers.forEach(cb => cb(updated));
       return moto;
     } catch (error) {
       console.error('Erro ao adicionar moto:', error);
@@ -313,13 +315,15 @@ export const motoService = {
 
   async updateMotoStatus(id: string, status: string): Promise<Moto | null> {
     try {
-      const motos = await this.getAllMotos();
-      const moto = motos.find(m => m.id === id);
-      
-      if (moto) {
-        moto.status = status;
-        await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(motos));
-        return moto;
+      const list = await this.getAllMotos();
+      const idx = list.findIndex(m => m.id === id);
+      if (idx >= 0) {
+        const updatedMoto: Moto = { ...list[idx], status };
+        const updated = [...list];
+        updated[idx] = updatedMoto;
+        await mockDb.setMotos(updated);
+        this.subscribers.forEach(cb => cb(updated));
+        return updatedMoto;
       }
       return null;
     } catch (error) {
@@ -340,10 +344,7 @@ export const motoService = {
 
   async resetStorage(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.MOTOS);
-      // Reinicializa com os dados mockados
-      await AsyncStorage.setItem(STORAGE_KEYS.MOTOS, JSON.stringify(mockMotos));
-      // Notifica todos os subscribers sobre a mudança
+      await mockDb.setMotos(mockMotos);
       this.subscribers.forEach(callback => callback(mockMotos));
     } catch (error) {
       console.error('Erro ao resetar storage:', error);
