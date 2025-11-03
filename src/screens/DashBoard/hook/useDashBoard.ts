@@ -61,9 +61,14 @@ export const useDashBoard = () => {
   }, [motos]);
 
   const patioOptions = useMemo(() => {
+    // USER/ADMIN veem apenas seu pátio; MASTER vê todos
+    const filtered = (user?.role === 'MASTER' || !user?.patioId)
+      ? patios
+      : patios.filter(p => p.id === user.patioId);
+
     // identificar cidades com múltiplas unidades
     const cityCounts = new Map<string, { cidade: string; estado: string; count: number }>();
-    patios.forEach(p => {
+    filtered.forEach(p => {
       const key = `${p.endereco.cidade}|${p.endereco.estado}`;
       const cur = cityCounts.get(key) || { cidade: p.endereco.cidade, estado: p.endereco.estado, count: 0 };
       cur.count += 1;
@@ -74,20 +79,27 @@ export const useDashBoard = () => {
       .filter(entry => entry.count > 1)
       .map(entry => ({ id: `CITY|${entry.cidade}|${entry.estado}`, label: `${entry.cidade}/${entry.estado} (todos)` }));
 
-    const individualOptions = patios.map(p => ({
+    const individualOptions = filtered.map(p => ({
       id: p.id as number,
       label: `${p.endereco.logradouro}, ${p.endereco.numero} - ${p.endereco.cidade}/${p.endereco.estado}`,
     }));
 
+    // Se USER/ADMIN: não mostrar "Todos os pátios" (têm apenas 1)
+    const showTodos = (user?.role === 'MASTER' || !user?.patioId);
     return [
-      { id: 'Todos' as const, label: 'Todos os pátios' },
+      ...(showTodos ? [{ id: 'Todos' as const, label: 'Todos os pátios' }] : []),
       ...groupOptions,
       ...individualOptions,
     ];
-  }, [patios]);
+  }, [patios, user]);
 
   const filteredMotos = useMemo(() => {
     return motos.filter(m => {
+      // USER/ADMIN veem apenas motos do seu pátio
+      if (user?.role !== 'MASTER' && user?.patioId) {
+        if (m.patioId !== user.patioId) return false;
+      }
+
       let matchesPatio = true;
       if (filterPatioId !== 'Todos') {
         if (typeof filterPatioId === 'string' && filterPatioId.startsWith('CITY|')) {
@@ -105,7 +117,7 @@ export const useDashBoard = () => {
       const matchesPlate = filterPlate.trim() === '' ? true : m.placa.toLowerCase().includes(filterPlate.trim().toLowerCase());
       return matchesPatio && matchesStatus && matchesPlate;
     });
-  }, [motos, filterPatioId, filterStatus, filterPlate, patios]);
+  }, [motos, filterPatioId, filterStatus, filterPlate, patios, user]);
 
   // Resetar filtros ao sair da aba/tela
   useFocusEffect(

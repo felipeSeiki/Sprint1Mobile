@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, RefreshControl, Modal, Alert } from 'react-native';
+import { ScrollView, View, RefreshControl, Modal, Alert, Text, TouchableOpacity } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/navigation';
 import { usersService } from '../../services/usersService';
@@ -37,19 +37,25 @@ export const EditUsersScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [editingUser, setEditingUser] = useState<Users | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [formData, setFormData] = useState({
     user: '',
     password: '',
   });
+  const [createData, setCreateData] = useState({
+    user: '',
+    password: '',
+    role: 'USER' as Users['role'],
+  });
 
   const [patioTitle, setPatioTitle] = useState<string>('');
 
-  // Verificação de acesso - apenas MASTER pode editar usuários
+  // Verificação de acesso - MASTER e ADMIN podem gerenciar usuários
   useEffect(() => {
-    if (user?.role !== 'MASTER') {
+    if (user?.role !== 'MASTER' && user?.role !== 'ADMIN') {
       Alert.alert(
         'Acesso Negado',
-        'Apenas o Master pode gerenciar usuários dos pátios.',
+        'Apenas Master ou Admin podem gerenciar usuários do pátio.',
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
     }
@@ -115,6 +121,25 @@ export const EditUsersScreen: React.FC = () => {
     })();
   };
 
+  const handleOpenCreate = () => {
+    setCreateData({ user: '', password: '', role: 'USER' });
+    setShowCreateModal(true);
+  };
+
+  const handleCreateUser = () => {
+    (async () => {
+      await usersService.create({
+        user: createData.user,
+        password: createData.password,
+        role: createData.role,
+        patioId: patioId,
+      } as Users);
+      await loadUsers();
+      setShowCreateModal(false);
+      Alert.alert('Sucesso', 'Usuário criado (sessão atual, não persiste no dispositivo).');
+    })();
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setEditingUser(null);
@@ -122,16 +147,21 @@ export const EditUsersScreen: React.FC = () => {
   };
 
   // Bloquear renderização se não for MASTER
-  if (user?.role !== 'MASTER') {
+  if (user?.role !== 'MASTER' && user?.role !== 'ADMIN') {
     return null;
   }
 
   return (
     <Container>
       <Content>
-        <Title>
-          Usuários do Pátio: {patioTitle}
-        </Title>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <Title>
+            Usuários do Pátio: {patioTitle}
+          </Title>
+          <ActionButton onPress={handleOpenCreate}>
+            <ActionButtonText>+ Adicionar Usuário</ActionButtonText>
+          </ActionButton>
+        </View>
 
         <TableContainer>
           <TableHeader>
@@ -203,6 +233,60 @@ export const EditUsersScreen: React.FC = () => {
               />
               <Button title="Salvar" onPress={handleSaveUser} buttonStyle={{ backgroundColor: '#00CF3A', marginTop: 12 }} />
               <Button title="Cancelar" onPress={handleCloseModal} type="outline" buttonStyle={{ marginTop: 8, borderColor: '#00CF3A' }} titleStyle={{ color: '#00CF3A' }} />
+            </ModalBody>
+          </ModalContent>
+        </ModalOverlay>
+      </Modal>
+
+      {/* Modal de criação (não persiste no AsyncStorage) */}
+      <Modal visible={showCreateModal} transparent animationType="fade" onRequestClose={() => setShowCreateModal(false)}>
+        <ModalOverlay>
+          <ModalContent>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <ModalTitle>Novo Usuário</ModalTitle>
+              <CloseButton onPress={() => setShowCreateModal(false)}>
+                <CloseText>✕</CloseText>
+              </CloseButton>
+            </View>
+            <ModalBody>
+              <Input
+                placeholder="Nome de Usuário"
+                value={createData.user}
+                onChangeText={(text) => setCreateData(prev => ({ ...prev, user: text }))}
+                inputStyle={{ color: '#FFFFFF' }}
+              />
+              <Input
+                placeholder="Senha"
+                value={createData.password}
+                onChangeText={(text) => setCreateData(prev => ({ ...prev, password: text }))}
+                secureTextEntry
+                inputStyle={{ color: '#FFFFFF' }}
+              />
+
+              {/* Seletor simples de role */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <Text style={{ color: '#fff', marginRight: 8 }}>Perfil:</Text>
+                {(['USER','ADMIN'] as Users['role'][]).map(r => (
+                  <TouchableOpacity
+                    key={r}
+                    onPress={() => setCreateData(prev => ({ ...prev, role: r }))}
+                    style={{
+                      paddingVertical: 6,
+                      paddingHorizontal: 10,
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: '#00CF3A',
+                      marginRight: 8,
+                      backgroundColor: createData.role === r ? '#00CF3A' : 'transparent',
+                    }}
+                  >
+                    <Text style={{ color: createData.role === r ? '#000' : '#fff' }}>{r}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <Button title="Criar" onPress={handleCreateUser} buttonStyle={{ backgroundColor: '#00CF3A', marginTop: 12 }} />
+              <Button title="Cancelar" onPress={() => setShowCreateModal(false)} type="outline" buttonStyle={{ marginTop: 8, borderColor: '#00CF3A' }} titleStyle={{ color: '#00CF3A' }} />
             </ModalBody>
           </ModalContent>
         </ModalOverlay>

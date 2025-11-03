@@ -14,7 +14,7 @@ export const useHome = () => {
   const [selectedPatioId, setSelectedPatioId] = useState<number | null>(null);
       const [selectedMoto, setSelectedMoto] = useState<Moto | null>(null);
       const [showModal, setShowModal] = useState(false);
-      const { signOut } = useAuth();
+      const { signOut, user } = useAuth();
     
       // Pan/zoom removidos para experiência fixa sem scroll/pan
     
@@ -27,10 +27,14 @@ export const useHome = () => {
         };
         const loadPatios = async () => {
           const list = await patioService.getAllPatios();
-          setPatios(list);
-          if (list && list.length > 0) {
+          // USER/ADMIN veem apenas seu pátio; MASTER vê todos
+          const filtered = (user?.role === 'MASTER' || !user?.patioId)
+            ? list
+            : list.filter(p => p.id === user.patioId);
+          setPatios(filtered);
+          if (filtered && filtered.length > 0) {
             // selecionar primeiro pátio por padrão
-            setSelectedPatioId(list[0].id);
+            setSelectedPatioId(filtered[0].id);
           }
         };
     
@@ -44,7 +48,7 @@ export const useHome = () => {
         return () => {
           if (unsubscribe) unsubscribe();
         };
-      }, []);
+      }, [user]);
     
       const handleMotoPress = (moto: Moto) => {
         setSelectedMoto(moto);
