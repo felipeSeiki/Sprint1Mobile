@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { authService } from '../services/auth';
+import { patioService } from '../services/patioService';
 import { AuthContextData, LoginCredentials, RegisterData, RegisterDataPatio, RegisterDataWithRole, User, Users, Patio } from '../types/auth';
 
 // Chaves de armazenamento
@@ -32,7 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         // Se for admin, verifica a existência do pátio no backend
         if (storedUser.role === 'ADMIN') {
-          const existingPatio = await authService.getPatio();
+          const existingPatio = await patioService.getPatio();
           if (existingPatio) {
             setPatio(existingPatio);
             setHasRegisteredPatio(true);
@@ -92,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const role = userObj?.role ?? userObj?.roles?.[0] ?? null;
       if (role === 'ADMIN') {
         try {
-          const existingPatio = await authService.getPatio();
+          const existingPatio = await patioService.getPatio();
           if (existingPatio) {
             setPatio(existingPatio);
             setHasRegisteredPatio(true);
@@ -155,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const registerPatio = async (data: RegisterDataPatio) => {
     try {
-      const patio = await authService.registerPatio(data);
+      const patio = await patioService.createPatio(data);
       setPatio(patio);
       setHasRegisteredPatio(true);
     } catch (error) {

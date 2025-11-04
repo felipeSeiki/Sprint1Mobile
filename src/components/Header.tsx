@@ -33,9 +33,7 @@ export const AppStackHeader: React.FC<NativeStackHeaderProps> = ({ route, naviga
   const displayName = (user && (user.user || (user as any).login || (user as any).name || (user as any).email)) || '';
   const isLogin = route?.name === 'Login';
   const isHome = route?.name === 'Home';
-  const isDashboard = (route?.name === 'Dashboard' && user?.role !== 'MASTER');
-  const isMaster = user?.role === 'MASTER';
-  const canNavigateHome = user && !isLogin && !isHome && isMaster && !isDashboard;
+  const canNavigateHome = user && !isLogin && !isHome;
 
   return (
     <StyledHeaderContainer showLogo>
@@ -45,7 +43,17 @@ export const AppStackHeader: React.FC<NativeStackHeaderProps> = ({ route, naviga
           style={{ width: 120, height: 40, resizeMode: 'contain' }}
         />
         {canNavigateHome && (
-          <TouchableOpacity onPress={() => navigation.navigate('Home' as any)} style={{ marginLeft: 16 }}>
+          <TouchableOpacity 
+            onPress={() => {
+              try {
+                console.log('Navegando para Home...');
+                navigation.navigate('Home' as any);
+              } catch (error) {
+                console.error('Erro ao navegar para Home:', error);
+              }
+            }} 
+            style={{ marginLeft: 16 }}
+          >
             <Icon name="home" type="material" color={theme.colors.white} size={28} />
           </TouchableOpacity>
         )}
@@ -73,12 +81,16 @@ interface StyledContainerProps {
 const StyledHeaderContainer = styled.View<StyledContainerProps>`
   background-color: #000; /* force dark header on web */
   padding: 12px 16px;
+  padding-top: 16px;
+  padding-bottom: 12px;
   border-bottom-width: 1px;
   border-bottom-color: #00CF3A;
   flex-direction: row;
   justify-content: ${(props: StyledContainerProps) => props.showLogo ? 'space-between' : 'center'};
   align-items: center;
   width: 100%;
+  min-height: 60px;
+  z-index: 1000;
 `;
 
 interface HeaderTitleProps {

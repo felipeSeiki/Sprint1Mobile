@@ -1,11 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../../contexts/AuthContext";
-import { motoService } from "../../../services/auth";
+import { motoService } from "../../../services/motoService";
 import { RegisterMotosScreenNavigationProp } from "../type/types";
 import { useState } from "react";
 
 export const useRegisterMoto = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
 
   const validStatuses = ['Disponível', 'Manutenção', 'Reservada'];
 
@@ -100,6 +100,7 @@ export const useRegisterMoto = () => {
         status: formData.status,
         posicaoX: String(position.x),
         posicaoY: String(position.y),
+        patioId: user?.patioId || undefined, // Associa a moto ao pátio do usuário
       };
 
       const addedMoto = await motoService.addMoto(newMoto);

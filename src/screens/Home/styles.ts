@@ -19,7 +19,7 @@ export const CardContainer = styled.View`
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  overflow: hidden;
+  position: relative;
 `;
 
 export const AnimatedCardContainer = styled(Animated.View)`
@@ -28,6 +28,7 @@ export const AnimatedCardContainer = styled(Animated.View)`
   background-color: #2A2A2A;
   border-radius: 20px;
   border: 2px solid #00CF3A;
+  overflow: visible;
   
   @media (min-width: 600px) {
     max-width: 700px;

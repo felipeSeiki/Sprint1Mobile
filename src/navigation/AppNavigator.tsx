@@ -31,11 +31,17 @@ export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-            screenOptions={{
+        screenOptions={{
           headerShown: true,
           header: (props) => <AppStackHeader {...props} />,
-              headerStyle: { backgroundColor: '#000' },
+          headerStyle: { 
+            backgroundColor: '#000',
+            height: 60,
+          },
           headerTransparent: false,
+          contentStyle: {
+            backgroundColor: '#1A1A1A',
+          },
         }}
       >
         {!user ? (

@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Moto } from "../../../types/motos";
 import { useAuth } from "../../../contexts/AuthContext";
-import { motoService } from "../../../services/auth";
+import { motoService } from "../../../services/motoService";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Patio, RootStackParamList } from "../../../types";
 import { patioService } from "../../../services/patioService";
 import { getLayoutForPatio, PatioLayout } from "../models/patioLayouts";
+import { mockDb } from "../../../services/mockDb";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const useHome = () => {
     const [selectedFilter, setSelectedFilter] = useState<string>('Todos');
@@ -14,41 +16,90 @@ export const useHome = () => {
   const [selectedPatioId, setSelectedPatioId] = useState<number | null>(null);
       const [selectedMoto, setSelectedMoto] = useState<Moto | null>(null);
       const [showModal, setShowModal] = useState(false);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
       const { signOut, user } = useAuth();
     
       // Pan/zoom removidos para experiência fixa sem scroll/pan
     
+      // Carrega dados iniciais
       useEffect(() => {
         let unsubscribe: (() => void) | undefined;
+        let isMounted = true;
     
         const loadMotos = async () => {
-          const allMotos = await motoService.getAllMotos();
-          setMotos(allMotos);
+          try {
+            const allMotos = await motoService.getAllMotos();
+            if (isMounted) {
+              setMotos(allMotos);
+            }
+          } catch (err) {
+            console.error('Erro ao carregar motos:', err);
+            if (isMounted) {
+              setError('Erro ao carregar motos');
+            }
+          }
         };
+
         const loadPatios = async () => {
-          const list = await patioService.getAllPatios();
-          // USER/ADMIN veem apenas seu pátio; MASTER vê todos
-          const filtered = (user?.role === 'MASTER' || !user?.patioId)
-            ? list
-            : list.filter(p => p.id === user.patioId);
-          setPatios(filtered);
-          if (filtered && filtered.length > 0) {
-            // selecionar primeiro pátio por padrão
-            setSelectedPatioId(filtered[0].id);
+          try {
+            // Garante que o mockDb está inicializado
+            await mockDb.init();
+            const list = await patioService.getAllPatios();
+            if (isMounted) {
+              // USER/ADMIN veem apenas seu pátio; MASTER vê todos
+              const filtered = (user?.role === 'MASTER' || !user?.patioId)
+                ? list
+                : list.filter(p => p.id === user.patioId);
+              setPatios(filtered);
+              if (filtered && filtered.length > 0) {
+                // selecionar primeiro pátio por padrão
+                setSelectedPatioId(filtered[0].id);
+              }
+            }
+          } catch (err) {
+            console.error('Erro ao carregar pátios:', err);
+            if (isMounted) {
+              setError('Erro ao carregar pátios');
+            }
+          } finally {
+            if (isMounted) {
+              setLoading(false);
+            }
           }
         };
     
         unsubscribe = motoService.subscribe((newMotos) => {
-          setMotos(newMotos);
+          if (isMounted) {
+            setMotos(newMotos);
+          }
         });
     
+        setLoading(true);
+        setError(null);
         loadMotos();
         loadPatios();
     
         return () => {
+          isMounted = false;
           if (unsubscribe) unsubscribe();
         };
       }, [user]);
+
+      // Recarrega motos quando a tela recebe foco (ex: voltar do cadastro)
+      useFocusEffect(
+        useCallback(() => {
+          const refreshMotos = async () => {
+            try {
+              const allMotos = await motoService.getAllMotos();
+              setMotos(allMotos);
+            } catch (err) {
+              console.error('Erro ao recarregar motos:', err);
+            }
+          };
+          refreshMotos();
+        }, [])
+      );
     
       const handleMotoPress = (moto: Moto) => {
         setSelectedMoto(moto);
@@ -167,6 +218,32 @@ export const useHome = () => {
       }, [assignedByCoord]);
 
       const motoAt = (x: number, y: number): Moto | undefined => assignedByCoord.get(`${x}-${y}`);
+
+      const reloadData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          // Garante que o mockDb está inicializado
+          await mockDb.init();
+          
+          const allMotos = await motoService.getAllMotos();
+          setMotos(allMotos);
+          
+          const list = await patioService.getAllPatios();
+          const filtered = (user?.role === 'MASTER' || !user?.patioId)
+            ? list
+            : list.filter(p => p.id === user.patioId);
+          setPatios(filtered);
+          if (filtered && filtered.length > 0) {
+            setSelectedPatioId(filtered[0].id);
+          }
+        } catch (err) {
+          console.error('Erro ao recarregar dados:', err);
+          setError('Erro ao recarregar dados');
+        } finally {
+          setLoading(false);
+        }
+      };
     
       return {
         selectedFilter,
@@ -186,5 +263,8 @@ export const useHome = () => {
         layout,
         layoutCapacity,
         occupancy,
+        loading,
+        error,
+        reloadData,
       }
 }

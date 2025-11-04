@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { Moto } from "../../../types/motos";
-import { motoService } from "../../../services/auth";
+import { motoService } from "../../../services/motoService";
 import { Patio, RootStackParamList } from "../../../types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { patioService } from "../../../services/patioService";
