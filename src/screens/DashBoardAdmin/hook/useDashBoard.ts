@@ -6,8 +6,7 @@ import { patioService } from "../../../services/patioService";
 import { useFocusEffect } from "@react-navigation/native";
 
 export const useDashBoard = () => {
-  const { signOut, user } = useAuth();
-  const [selectedFilter, setSelectedFilter] = useState<string>("Todas");
+  const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [selectedPatio, setSelectedPatio] = useState<Patio | null>(null);
   const [patios, setPatios] = useState<Patio[]>([]);
@@ -65,15 +64,7 @@ export const useDashBoard = () => {
     setShowModal(true);
   };
 
-  const handleLogOut = (
-    navigation: NativeStackNavigationProp<RootStackParamList, "Dashboard">
-  ) => {
-    signOut();
-    navigation.navigate("Login");
-  };
-
   return {
-    selectedFilter,
     showModal,
     setShowModal,
     selectedPatio,

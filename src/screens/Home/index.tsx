@@ -38,6 +38,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const lastScale = useRef(1);
     const initialDistance = useRef(0);
     
+    // Refs para armazenar os valores atuais de pan e scale
+    const currentPanX = useRef(0);
+    const currentPanY = useRef(0);
+    const currentScale = useRef(1);
+    
+    // Adicionar listeners para atualizar os valores atuais
+    React.useEffect(() => {
+        const panXListener = pan.x.addListener(({ value }) => {
+            currentPanX.current = value;
+        });
+        const panYListener = pan.y.addListener(({ value }) => {
+            currentPanY.current = value;
+        });
+        const scaleListener = scale.addListener(({ value }) => {
+            currentScale.current = value;
+        });
+        
+        return () => {
+            pan.x.removeListener(panXListener);
+            pan.y.removeListener(panYListener);
+            scale.removeListener(scaleListener);
+        };
+    }, []);
+    
     const screenWidth = Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
     
@@ -50,8 +74,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         onPanResponderGrant: (evt) => {
           // Salva a posição atual do pan
           pan.setOffset({
-            x: (pan.x as any)._value || 0,
-            y: (pan.y as any)._value || 0,
+            x: currentPanX.current,
+            y: currentPanY.current,
           });
           
           // Detecta zoom inicial com dois dedos
@@ -62,7 +86,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               Math.pow(touch2.pageX - touch1.pageX, 2) +
               Math.pow(touch2.pageY - touch1.pageY, 2)
             );
-            lastScale.current = (scale as any)._value || 1;
+            lastScale.current = currentScale.current;
           }
         },
         
@@ -91,24 +115,24 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         
         onPanResponderRelease: () => {
           pan.flattenOffset();
-          const currentScale = (scale as any)._value || 1;
-          lastScale.current = currentScale;
+          const currentScaleValue = currentScale.current;
+          lastScale.current = currentScaleValue;
           initialDistance.current = 0;
           
           // Limita o movimento para não sair muito da tela quando há zoom
-          if (currentScale > 1) {
-            const maxX = (screenWidth * (currentScale - 1)) / 2;
-            const maxY = (screenHeight * (currentScale - 1)) / 2;
+          if (currentScaleValue > 1) {
+            const maxX = (screenWidth * (currentScaleValue - 1)) / 2;
+            const maxY = (screenHeight * (currentScaleValue - 1)) / 2;
             
             Animated.parallel([
               Animated.spring(pan.x, {
-                toValue: Math.max(-maxX, Math.min(maxX, pan.x._value)),
+                toValue: Math.max(-maxX, Math.min(maxX, currentPanX.current)),
                 useNativeDriver: false,
                 tension: 50,
                 friction: 7,
               }),
               Animated.spring(pan.y, {
-                toValue: Math.max(-maxY, Math.min(maxY, pan.y._value)),
+                toValue: Math.max(-maxY, Math.min(maxY, currentPanY.current)),
                 useNativeDriver: false,
                 tension: 50,
                 friction: 7,

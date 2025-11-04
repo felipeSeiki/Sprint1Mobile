@@ -1,4 +1,5 @@
-import { ScrollView } from "react-native-gesture-handler";
+import React from 'react';
+import { ScrollView } from "react-native";
 import { HeaderText, ListHeader, MotoItem, MotoList, MotoText, StatusBadge, StatusText } from "../styles";
 import { Moto } from "../../../types/motos";
 

@@ -36,7 +36,6 @@ export const AppNavigator: React.FC = () => {
           header: (props) => <AppStackHeader {...props} />,
           headerStyle: { 
             backgroundColor: '#000',
-            height: 60,
           },
           headerTransparent: false,
           contentStyle: {

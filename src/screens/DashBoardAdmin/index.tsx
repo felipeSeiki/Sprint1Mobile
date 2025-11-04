@@ -7,7 +7,6 @@ import { ActionBar, AddButton, AddButtonText, Container, Content, FilterButton, 
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const {
-    selectedFilter,
     showModal,
     setShowModal,
     selectedPatio,
@@ -32,12 +31,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
       <Content>
 
         <ActionBar>
-          <FilterContainer>
-            <FilterLabel>Filtro:</FilterLabel>
-            <FilterButton>
-              <FilterText>{selectedFilter}</FilterText>
-            </FilterButton>
-          </FilterContainer>
 
           <AddButton onPress={handleAddPatio}>
             <AddButtonText>+ ADD PÁTIO</AddButtonText>
