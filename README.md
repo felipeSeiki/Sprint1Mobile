@@ -115,7 +115,7 @@ npx expo start
 
 ## 📋 Hash do Commit Final
 ```
-7004d1bc9c914bde3d02fadd8532477a6cdf960d
+fca9f8ccd7bf171a6844d802d7e0aea6388bd3e5
 ```
 
 ## 🌐 Links Úteis
