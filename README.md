@@ -77,11 +77,11 @@ npx expo start
 
 ### QR Code
 
-![alt text](image.png)
+![alt text](image-1.png)
 
 ### **Hash do Commit Final:**
 ```
-eae66b7cde41f1dc203ab2394999032ad7b15fbd
+4b59efaad96efa3c1f9b1160110a517d7eac19d8
 ```
 
 ### **EAS Update ID:**
