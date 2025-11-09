@@ -11,10 +11,11 @@ export const Content = styled.View`
 `;
 
 export const Title = styled.Text`
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   color: #00CF3A;
-  margin-bottom: 20px;
+  flex-wrap: wrap;
+  line-height: 24px;
 `;
 
 export const TableContainer = styled.View`
@@ -65,6 +66,42 @@ export const ActionButtonText = styled.Text`
   color: #ffffff;
   font-weight: bold;
   font-size: 14px;
+`;
+
+export const HeaderContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+`;
+
+export const TitleContainer = styled.View`
+  flex: 1;
+  min-width: 200px;
+  padding-right: 8px;
+`;
+
+export const AddButtonContainer = styled.View`
+  flex-shrink: 0;
+  min-width: 160px;
+`;
+
+export const AddButton = styled.TouchableOpacity`
+  background-color: #00cf3a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+`;
+
+export const AddButtonText = styled.Text`
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
 `;
 
 export const ModalOverlay = styled.View`

@@ -1,12 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ScrollView, View, RefreshControl, Modal, Alert, Text, TouchableOpacity } from 'react-native';
-import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../../types/navigation';
-import { usersService } from '../../services/usersService';
-import { patioService } from '../../services/patioService';
 import { Users } from '../../types/auth';
 import { Input, Button } from 'react-native-elements';
-import { useAuth } from '../../contexts/AuthContext';
 import {
   Container,
   Content,
@@ -18,6 +13,11 @@ import {
   RowText,
   ActionButton,
   ActionButtonText,
+  HeaderContainer,
+  TitleContainer,
+  AddButtonContainer,
+  AddButton,
+  AddButtonText,
   ModalOverlay,
   ModalContent,
   ModalTitle,
@@ -25,127 +25,31 @@ import {
   CloseText,
   ModalBody,
 } from './styles';
-
-type EditUsersRouteProp = RouteProp<RootStackParamList, 'EditUsers'>;
+import { useEditUsers } from './hooks/useEditUsers';
 
 export const EditUsersScreen: React.FC = () => {
-  const route = useRoute<EditUsersRouteProp>();
-  const navigation = useNavigation();
-  const { user } = useAuth();
-  const { patioId } = route.params;
-  const [users, setUsers] = useState<Users[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [editingUser, setEditingUser] = useState<Users | null>(null);
-  const [showModal, setShowModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [formData, setFormData] = useState({
-    user: '',
-    password: '',
-  });
-  const [createData, setCreateData] = useState({
-    user: '',
-    password: '',
-    role: 'USER' as Users['role'],
-  });
 
-  const [patioTitle, setPatioTitle] = useState<string>('');
-
-  // Verificação de acesso - MASTER e ADMIN podem gerenciar usuários
-  useEffect(() => {
-    if (user?.role !== 'MASTER' && user?.role !== 'ADMIN') {
-      Alert.alert(
-        'Acesso Negado',
-        'Apenas Master ou Admin podem gerenciar usuários do pátio.',
-        [{ text: 'OK', onPress: () => navigation.goBack() }]
-      );
-    }
-  }, [user, navigation]);
-
-  const loadUsers = async () => {
-    const patioUsers = await usersService.listByPatio(patioId);
-    setUsers(patioUsers);
-  };
-
-  useEffect(() => {
-    (async () => {
-      await loadUsers();
-      const patio = await patioService.getPatioById(patioId);
-      if (patio) setPatioTitle(`${patio.endereco.cidade}/${patio.endereco.estado}`);
-    })();
-  }, [patioId]);
-
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadUsers();
-    setRefreshing(false);
-  };
-
-  const handleEditUser = (user: Users) => {
-    setEditingUser(user);
-    setFormData({
-      user: user.user,
-      password: user.password,
-    });
-    setShowModal(true);
-  };
-
-  const handleDeleteUser = (userId: string) => {
-    Alert.alert(
-      'Confirmar Exclusão',
-      'Deseja realmente excluir este usuário?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Excluir',
-          style: 'destructive',
-          onPress: () => {
-            (async () => {
-              await usersService.remove(userId);
-              await loadUsers();
-              Alert.alert('Sucesso', 'Usuário excluído');
-            })();
-          },
-        },
-      ]
-    );
-  };
-
-  const handleSaveUser = () => {
-    if (!editingUser) return;
-
-    (async () => {
-      await usersService.update(editingUser.id!, { user: formData.user, password: formData.password });
-      await loadUsers();
-      setShowModal(false);
-      Alert.alert('Sucesso', 'Usuário atualizado');
-    })();
-  };
-
-  const handleOpenCreate = () => {
-    setCreateData({ user: '', password: '', role: 'USER' });
-    setShowCreateModal(true);
-  };
-
-  const handleCreateUser = () => {
-    (async () => {
-      await usersService.create({
-        user: createData.user,
-        password: createData.password,
-        role: createData.role,
-        patioId: patioId,
-      } as Users);
-      await loadUsers();
-      setShowCreateModal(false);
-      Alert.alert('Sucesso', 'Usuário criado (sessão atual, não persiste no dispositivo).');
-    })();
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setEditingUser(null);
-    setFormData({ user: '', password: '' });
-  };
-
+  const {
+    user,
+    users,
+    refreshing,
+    onRefresh,
+    patioTitle,
+    showModal,
+    formData,
+    setFormData,
+    handleEditUser,
+    handleDeleteUser,
+    handleSaveUser,
+    showCreateModal,
+    createData,
+    setCreateData,
+    handleOpenCreate,
+    handleCreateUser,
+    handleCloseModal,
+    setShowCreateModal
+  } = useEditUsers();
+  
   // Bloquear renderização se não for MASTER
   if (user?.role !== 'MASTER' && user?.role !== 'ADMIN') {
     return null;
@@ -154,14 +58,18 @@ export const EditUsersScreen: React.FC = () => {
   return (
     <Container>
       <Content>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <Title>
-            Usuários do Pátio: {patioTitle}
-          </Title>
-          <ActionButton onPress={handleOpenCreate}>
-            <ActionButtonText>+ Adicionar Usuário</ActionButtonText>
-          </ActionButton>
-        </View>
+        <HeaderContainer>
+          <TitleContainer>
+            <Title>
+              Usuários do Pátio: {patioTitle}
+            </Title>
+          </TitleContainer>
+          <AddButtonContainer>
+            <AddButton onPress={handleOpenCreate}>
+              <AddButtonText>+ Adicionar Usuário</AddButtonText>
+            </AddButton>
+          </AddButtonContainer>
+        </HeaderContainer>
 
         <TableContainer>
           <TableHeader>
