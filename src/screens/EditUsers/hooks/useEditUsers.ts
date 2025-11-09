@@ -121,7 +121,7 @@ export const useEditUsers = () => {
       setShowCreateModal(false);
       Alert.alert(
         "Sucesso",
-        "Usuário criado (sessão atual, não persiste no dispositivo)."
+        "Usuário criado com sucesso!"
       );
     })();
   };
