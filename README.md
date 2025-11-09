@@ -51,22 +51,6 @@ npm install
 npx expo start
 ```
 
-## 📱 Testar o Aplicativo
-
-### 🚀 **App Publicado via EAS** (Recomendado)
-> **Versão permanente - funciona sempre, mesmo offline**
-
-**📱 Acesso via Expo Go:**
-1. Baixe o "Expo Go" no seu celular (Android/iOS)
-2. Abra o app e vá em **"Published Projects"**
-3. Procure por **"MeuPrimeiroApp"** (@felipeseiki)
-4. Ou acesse diretamente: **https://expo.dev/accounts/felipeseiki/projects/MeuPrimeiroApp**
-
-**🔗 EAS Update URL:**
-```
-exp://u.expo.dev/b7b837ee-c8eb-4197-8a1e-33685c59463c
-```
-
 ### 💻 **Desenvolvimento Local** (Alternativo)
 Para testar durante desenvolvimento:
 ```bash
@@ -90,6 +74,10 @@ npx expo start
 **Link do Figma**: [Protótipo DashMottu](https://www.figma.com/design/dashMottu-fleet-management)
 
 ## 📋 Informações Técnicas
+
+### QR Code
+
+![alt text](image.png)
 
 ### **Hash do Commit Final:**
 ```
