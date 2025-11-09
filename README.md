@@ -53,40 +53,68 @@ npx expo start
 
 ## 📱 Testar o Aplicativo
 
-### QR Code para teste:
+### 🚀 **App Publicado via EAS** (Recomendado)
+> **Versão permanente - funciona sempre, mesmo offline**
+
+**📱 Acesso via Expo Go:**
+1. Baixe o "Expo Go" no seu celular (Android/iOS)
+2. Abra o app e vá em **"Published Projects"**
+3. Procure por **"MeuPrimeiroApp"** (@felipeseiki)
+4. Ou acesse diretamente: **https://expo.dev/accounts/felipeseiki/projects/MeuPrimeiroApp**
+
+**🔗 EAS Update URL:**
 ```
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█ ▄▄▄▄▄ █▄▄▄ ▀▄▀█▄█ ▄▄▄▄▄ █
-█ █   █ ██▄▀ █  ▀▀█ █   █ █
-█ █▄▄▄█ ██▀▄ ▄▀████ █▄▄▄█ █
-█▄▄▄▄▄▄▄█ ▀▄█ ▀▄█ █▄▄▄▄▄▄▄█
-█ ▄▀▄▄▀▄▀█▄▀█▄▀█ ▀█▄█▀█▀▀▄█
-█      ▄ ▄▄██▄▄▄▄ ▀███▄▀▀ █
-█ █▀  █▄▀   █▀█▄ █ ▄▀▀█▀ ██
-█ ▄█ ▄▀▄ █ ██▀▄▀ ▄▀ ██▄▀  █
-█▄██▄▄█▄█ ▄  ▄▄ █ ▄▄▄  ▄▀▄█
-█ ▄▄▄▄▄ ██▀█▀▄  █ █▄█ ███ █
-█ █   █ █  █▄ ▀█▄ ▄  ▄ █▀▀█
-█ █▄▄▄█ █▀█  ▀█▄ ▄█▀▀▄█   █
-█▄▄▄▄▄▄▄█▄▄▄▄██▄▄▄▄█▄▄███▄█
+exp://u.expo.dev/b7b837ee-c8eb-4197-8a1e-33685c59463c
 ```
 
-### Instruções:
-1. **Android**: Baixe o "Expo Go" na Play Store
-2. **iOS**: Use a câmera nativa do iPhone
-3. **Escaneie o QR Code** acima
-4. **Teste as funcionalidades**:
-   - Login: `admin@mottu.com` / `123456`
-   - Navegue pelas telas e teste todas as funcionalidades
+### 💻 **Desenvolvimento Local** (Alternativo)
+Para testar durante desenvolvimento:
+```bash
+npx expo start
+# Escaneie o QR Code gerado
+```
+
+### 🔐 **Credenciais de Teste:**
+- **Admin**: `admin@mottu.com` / `123456`
+- **Operador**: `operador@mottu.com` / `123456`
+
+### 📋 **Funcionalidades para Testar:**
+- ✅ Login/Logout com diferentes perfis
+- ✅ Cadastro de motos com validação
+- ✅ Gerenciamento de usuários por pátio  
+- ✅ Dashboard com filtros dinâmicos
+- ✅ Navegação entre todas as telas
+- ✅ Persistência de dados local
 
 ## 🎨 Design e Prototipação
 **Link do Figma**: [Protótipo DashMottu](https://www.figma.com/design/dashMottu-fleet-management)
 
-## 📋 Hash do Commit Final
+## 📋 Informações Técnicas
+
+### **Hash do Commit Final:**
 ```
-928e52353d2196c1bf3737e39b2896b0b63755cd
+eae66b7cde41f1dc203ab2394999032ad7b15fbd
 ```
 
-## 🌐 Links Úteis
-- **Repositório**: [https://github.com/felipeSeiki/Sprint1Mobile](https://github.com/felipeSeiki/Sprint1Mobile)
-- **Expo Metro**: `exp://192.168.15.33:8081`
+### **EAS Update ID:**
+```
+8afe78f9-94fb-417b-9145-1facd2909054
+```
+
+## 🌐 Links Importantes
+
+| Tipo | Link | Descrição |
+|------|------|-----------|
+| **📱 App Publicado** | [Expo Dashboard](https://expo.dev/accounts/felipeseiki/projects/MeuPrimeiroApp) | Versão permanente do app |
+| **💻 Repositório** | [GitHub](https://github.com/felipeSeiki/Sprint1Mobile) | Código fonte completo |
+| **🎨 Protótipo** | [Figma](https://www.figma.com/design/dashMottu-fleet-management) | Design e wireframes |
+| **📊 EAS Update** | [Dashboard EAS](https://expo.dev/accounts/felipeseiki/projects/MeuPrimeiroApp/updates/8afe78f9-94fb-417b-9145-1facd2909054) | Detalhes da publicação |
+
+---
+
+### 🎯 **Status da Entrega - Sprint 4**
+✅ **App Completo e Funcional** - Todas as telas implementadas  
+✅ **Publicado via EAS** - Acesso permanente via Expo Go  
+✅ **Documentação Completa** - README atualizado  
+✅ **CRUD Implementado** - Motos, Usuários e Pátios  
+✅ **Pronto para Avaliação** - Hash e links disponíveis
